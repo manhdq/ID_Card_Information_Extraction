@@ -31,7 +31,79 @@ The pineline of this sources consists of 3 steps:
 
 ## <div align="center">Quick Start Tutorial</div>
 <details open>
+You should download each checkpoint for each module and place it in its ckpts path according to the pretrained models I prepare in here.
+
+---
+
+**Keypoint detection**
+|     Module type    |         Chung Minh Thu         |      Can Cuoc Cong Dan     |
+|--------------------|--------------------------------|----------------------------|
+|  **Link download** |    [Google Drive](https://drive.google.com/drive/folders/1v9kDHi7SmlMSuT0LEx3F_Nr9zBn_zpTb?usp=sharing) / [One Drive](https://1drv.ms/u/s!AlNB7KJjl-eBg3SUBc0D9z1OOGu9?e=XT3aQ4)    |  [Google Drive](https://drive.google.com/drive/folders/12JJRSOCVW8WniezsS0aTBaItYiCTTNUI?usp=sharing) / [One Drive](https://1drv.ms/u/s!AlNB7KJjl-eBg3PKyze5RxIuYFLi?e=Kr4LgH)  |
+
+---
+
+**Line detection**
+|     Module type    |            Chung Minh Thu            |      Can Cuoc Cong Dan     |
+|--------------------|--------------------------------------|----------------------------|
+|       **FPN**      |       [Google Drive](https://drive.google.com/drive/folders/1aiU5AUNsMim2f4P9Kwrd-Znw_Sjlju1G?usp=sharing) / [One Drive](https://1drv.ms/u/s!AlNB7KJjl-eBhAWn0lVIMYVCVIJ3?e=PkBwmA)       |  [Google Drive](https://drive.google.com/drive/folders/1VS_kMNgmktoXnxBe7AEmcgdEq1kOXDTk?usp=sharing) / [One Drive](https://1drv.ms/u/s!AlNB7KJjl-eBhATGXebOFlVk300Z?e=dm8KqV)  |
+|       **PAN**      |       Google Drive / One Drive       |  Google Drive / One Drive  |
+
+---
+
+**OCR**
+|     Module type    |            VietOCR            |
+|--------------------|-------------------------------|
+|   **VGG_Seq2Seq**  |   [Google Drive](https://drive.google.com/drive/folders/1oiD5jUv-LNnS_JRcSzmxxISjwAA0xOdh?usp=sharing) / [One Drive](https://1drv.ms/u/s!AlNB7KJjl-eBhGD-qkL1M6hxE9x1?e=n1MSUI)    |
+|**VGG_Transformer** |   [Google Drive](https://drive.google.com/drive/folders/128Y70MMYG7ePzrpT49izJvQ0yyi_ZAKO?usp=sharing) / [One Drive](https://1drv.ms/u/s!AlNB7KJjl-eBhGGsOgLfoCXPPjh4?e=eaLMOA)    |
+
+---
+
+
+
+Example save checkpoints
+```
+ckpts
+|-- keypoint_detector_weights
+|   |-- cmt_final_500m_kpts_weights
+|   |   |-- best.pth
+|   |   `-- config.py
+|   |-- cmt_final_500m_kpts_weights
+|   |   |-- best.pth
+|   |   `-- config.py
+|   `-- ...
+|
+|-- line_detector_weights
+|   `-- FPN
+|       |-- cmt_resnet50
+|       |   |-- best_model.pth
+|       |   `-- label_map.txt
+|       |-- cccd_resnet50
+|       |   |-- best_model.pth
+|       |   `-- label_map.txt.py
+|       `-- ...
+|
+|-- information_extractor_weights
+|   |-- vgg_seq2seq
+|   |   `-- seq2seqocr.pth
+|   |-- vgg_transformer
+|   |   `-- transformerocr.pth
+|   `-- ...
+
+keypoint_detection
+
+line_detection
+
+...
+```
+
+
+</details>
+
+
+<details open>
 <summary>Set up dependencies</summary>
+
+**For cuda usage**
 
 Set up new conda environment
 
@@ -51,6 +123,22 @@ Install suitable pytorch libraries and install several dependencies
 
 ```bash
 conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=11.3 -c pytorch
+pip install -r requirements.py
+```
+
+**For cpu usage only**
+
+Set up new conda environment
+
+```bash
+conda create -n id_card python=3.9.11
+conda activate id_card
+```
+
+Install suitable pytorch libraries and install several dependencies
+
+```bash
+conda install torch torchvision torchaudio
 pip install -r requirements.py
 ```
 
@@ -92,11 +180,11 @@ ignores_list: ['background', 'bg']  # ignored class from labelmap
 # ocr model options
 ocr_config_name: 'vgg_seq2seq'
 # ocr_config_name: 'vgg_transformer'
-ocr_weights: ~
+ocr_weights: 'ckpts/information_extractor_weights/vgg_seq2seq/seq2seqocr.pth'
 
 # other options
 save_dir: 'runs'  # save directory for information extraction
-no_gpu: False   # unable gpu
+no_gpu: True   # unable gpu
 delay: 60  # delay time for real time scanning
 
 return_kpts_coords: False

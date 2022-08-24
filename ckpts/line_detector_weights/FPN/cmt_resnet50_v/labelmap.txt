@@ -1,8 +1,0 @@
-# label:color_rgb:parts:actions
-background:0,0,0::
-address:204,153,51::
-bg:43,0,255::
-birthday:102,255,102::
-countryside:250,250,55::
-identity_number:42,125,209::
-name:250,50,83::

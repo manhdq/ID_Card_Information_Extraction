@@ -15,7 +15,7 @@ ignores_list: ['background', 'bg']  # ignored class from labelmap
 # ocr model options
 ocr_config_name: 'vgg_seq2seq'
 # ocr_config_name: 'vgg_transformer'
-ocr_weights: ~
+ocr_weights: 'ckpts/information_extractor_weights/vgg_seq2seq/seq2seqocr.pth'
 
 # other options
 save_dir: 'runs_v2'  # save directory for information extraction

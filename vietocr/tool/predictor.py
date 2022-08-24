@@ -11,7 +11,7 @@ class Predictor():
         
         model, vocab = build_model(config)
         weights = '/tmp/weights.pth'
-
+        print(config['weights'])
         if config['weights'].startswith('http'):
             weights = download_weights(config['weights'])
         else:
