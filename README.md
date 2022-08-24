@@ -105,7 +105,7 @@ line_detection
 <details open>
 <summary>Set up dependencies</summary>
 
-**For cuda usage**
+## **For cuda usage**
 
 Set up new conda environment
 
@@ -128,7 +128,7 @@ conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit
 pip install -r requirements.py
 ```
 
-**For cpu usage only**
+## **For cpu usage only**
 
 Set up new conda environment
 
