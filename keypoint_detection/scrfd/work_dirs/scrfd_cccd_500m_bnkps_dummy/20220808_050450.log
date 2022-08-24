@@ -1,0 +1,512 @@
+2022-08-08 05:04:50,756 - mmdet - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.9.11 (main, Mar 29 2022, 19:08:29) [GCC 7.5.0]
+CUDA available: True
+GPU 0: Tesla T4
+CUDA_HOME: /root/miniconda3/envs/manhdq
+NVCC: Cuda compilation tools, release 11.3, V11.3.58
+GCC: gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0
+PyTorch: 1.11.0+cu113
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) Math Kernel Library Version 2020.0.0 Product Build 20191122 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.5.2 (Git Hash a9302535553c73243c632ad3c4c80beec3d19a1e)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.3
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86
+  - CuDNN 8.2
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.3, CUDNN_VERSION=8.2.0, CXX_COMPILER=/opt/rh/devtoolset-7/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DEDGE_PROFILER_USE_KINETO -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.11.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=OFF, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+TorchVision: 0.12.0+cu113
+OpenCV: 4.4.0
+MMCV: 1.5.3
+MMCV Compiler: n/a
+MMCV CUDA Compiler: n/a
+MMDetection: 2.7.0+
+------------------------------------------------------------
+
+2022-08-08 05:04:51,706 - mmdet - INFO - Distributed training: True
+2022-08-08 05:04:52,632 - mmdet - INFO - Config:
+optimizer = dict(type='Adam', lr=6.25e-05, weight_decay=0.0005)
+optimizer_config = dict(grad_clip=None)
+lr_mult = 8
+lr_config = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=10,
+    warmup_ratio=0.001,
+    step=[32, 48])
+total_epochs = 64
+checkpoint_config = dict(interval=5)
+log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = '/home/manhdq/ID_Card_Information_Extraction/keypoint_detection/scrfd/work_dirs/scrfd_cccd_500m_bnkps_dummy/best.pth'
+resume_from = None
+workflow = [('train', 1)]
+dataset_type = 'RetinaFaceDataset'
+data_root = '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd'
+train_root = [
+    '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean_v2'
+]
+val_root = '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean'
+img_norm_cfg = dict(
+    mean=[127.5, 127.5, 127.5], std=[128.0, 128.0, 128.0], to_rgb=True)
+albu_train_transforms = [
+    dict(
+        type='OneOf',
+        transforms=[
+            dict(
+                type='Affine',
+                scale=None,
+                rotate=(-90, 90),
+                shear=None,
+                interpolation=0,
+                fit_output=True)
+        ],
+        p=0.6),
+    dict(
+        type='OneOf',
+        transforms=[
+            dict(type='MotionBlur'),
+            dict(type='GaussianBlur', blur_limit=3)
+        ],
+        p=0.2),
+    dict(type='ToGray', p=0.2)
+]
+train_pipeline = [
+    dict(type='LoadImageFromFile', to_float32=True),
+    dict(type='LoadAnnotations', with_bbox=True, with_keypoints=True),
+    dict(
+        type='RandomSquareCrop',
+        crop_choice=[0.3, 0.45, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0]),
+    dict(type='Resize', img_scale=(640, 640), keep_ratio=False),
+    dict(
+        type='RandomFlip',
+        flip_ratio=0.5,
+        direction=['horizontal', 'vertical', 'diagonal']),
+    dict(
+        type='PhotoMetricDistortion',
+        brightness_delta=32,
+        contrast_range=(0.5, 1.5),
+        saturation_range=(0.5, 1.5),
+        hue_delta=18),
+    dict(
+        type='Normalize',
+        mean=[127.5, 127.5, 127.5],
+        std=[128.0, 128.0, 128.0],
+        to_rgb=True),
+    dict(type='DefaultFormatBundle'),
+    dict(
+        type='Collect',
+        keys=[
+            'img', 'gt_bboxes', 'gt_labels', 'gt_bboxes_ignore',
+            'gt_keypointss'
+        ])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=(640, 640),
+        flip=False,
+        transforms=[
+            dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip', flip_ratio=0.0),
+            dict(
+                type='Normalize',
+                mean=[127.5, 127.5, 127.5],
+                std=[128.0, 128.0, 128.0],
+                to_rgb=True),
+            dict(type='Pad', size=(640, 640), pad_val=0),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ])
+]
+data = dict(
+    samples_per_gpu=32,
+    workers_per_gpu=8,
+    train=dict(
+        type='RetinaFaceDataset',
+        ann_file=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean_v2/annotations.txt',
+        img_prefix=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean_v2/images',
+        pipeline=[
+            dict(type='LoadImageFromFile', to_float32=True),
+            dict(type='LoadAnnotations', with_bbox=True, with_keypoints=True),
+            dict(
+                type='RandomSquareCrop',
+                crop_choice=[
+                    0.3, 0.45, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0
+                ]),
+            dict(type='Resize', img_scale=(640, 640), keep_ratio=False),
+            dict(
+                type='RandomFlip',
+                flip_ratio=0.5,
+                direction=['horizontal', 'vertical', 'diagonal']),
+            dict(
+                type='PhotoMetricDistortion',
+                brightness_delta=32,
+                contrast_range=(0.5, 1.5),
+                saturation_range=(0.5, 1.5),
+                hue_delta=18),
+            dict(
+                type='Normalize',
+                mean=[127.5, 127.5, 127.5],
+                std=[128.0, 128.0, 128.0],
+                to_rgb=True),
+            dict(type='DefaultFormatBundle'),
+            dict(
+                type='Collect',
+                keys=[
+                    'img', 'gt_bboxes', 'gt_labels', 'gt_bboxes_ignore',
+                    'gt_keypointss'
+                ])
+        ]),
+    val=dict(
+        type='RetinaFaceDataset',
+        ann_file=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean/annotations.txt',
+        img_prefix=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean/images',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', with_bbox=True, with_keypoints=True),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(640, 640),
+                flip=False,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip', flip_ratio=0.0),
+                    dict(
+                        type='Normalize',
+                        mean=[127.5, 127.5, 127.5],
+                        std=[128.0, 128.0, 128.0],
+                        to_rgb=True),
+                    dict(type='Pad', size=(640, 640), pad_val=0),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]),
+    infer=dict(
+        type='RetinaFaceDataset',
+        ann_file=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean/annotations.txt',
+        img_prefix=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean/images',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', with_bbox=True, with_keypoints=True),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(640, 640),
+                flip=False,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip', flip_ratio=0.0),
+                    dict(
+                        type='Normalize',
+                        mean=[127.5, 127.5, 127.5],
+                        std=[128.0, 128.0, 128.0],
+                        to_rgb=True),
+                    dict(type='Pad', size=(640, 640), pad_val=0),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(
+                        type='Collect',
+                        keys=[
+                            'img', 'gt_bboxes', 'gt_labels',
+                            'gt_bboxes_ignore', 'gt_keypointss'
+                        ])
+                ])
+        ]),
+    test=dict(
+        type='RetinaFaceDataset',
+        ann_file=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean/annotations.txt',
+        img_prefix=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean/images',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(640, 640),
+                flip=False,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip', flip_ratio=0.0),
+                    dict(
+                        type='Normalize',
+                        mean=[127.5, 127.5, 127.5],
+                        std=[128.0, 128.0, 128.0],
+                        to_rgb=True),
+                    dict(type='Pad', size=(640, 640), pad_val=0),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]))
+model = dict(
+    type='SCRFD',
+    backbone=dict(
+        type='MobileNetV1',
+        block_cfg=dict(
+            stage_blocks=(2, 3, 2, 6), stage_planes=[16, 16, 40, 72, 152,
+                                                     288])),
+    neck=dict(
+        type='PAFPN',
+        in_channels=[40, 72, 152, 288],
+        out_channels=16,
+        start_level=1,
+        add_extra_convs='on_output',
+        num_outs=3),
+    bbox_head=dict(
+        type='SCRFDHead',
+        num_classes=1,
+        in_channels=16,
+        stacked_convs=2,
+        feat_channels=64,
+        norm_cfg=dict(type='BN', requires_grad=True),
+        cls_reg_share=True,
+        strides_share=False,
+        dw_conv=True,
+        scale_mode=0,
+        anchor_generator=dict(
+            type='AnchorGenerator',
+            ratios=[1.0],
+            scales=[1, 2],
+            base_sizes=[16, 64, 256],
+            strides=[8, 16, 32]),
+        loss_cls=dict(
+            type='QualityFocalLoss',
+            use_sigmoid=True,
+            beta=2.0,
+            loss_weight=1.0),
+        loss_dfl=False,
+        reg_max=8,
+        loss_bbox=dict(type='DIoULoss', loss_weight=1.0),
+        use_kps=True,
+        loss_kps=dict(
+            type='SmoothL1Loss', beta=0.1111111111111111, loss_weight=1.5),
+        train_cfg=dict(
+            assigner=dict(type='ATSSAssigner', topk=9),
+            allowed_border=-1,
+            pos_weight=-1,
+            debug=False),
+        test_cfg=dict(
+            nms_pre=-1,
+            min_bbox_size=0,
+            score_thr=0.02,
+            nms=dict(type='nms', iou_threshold=0.45),
+            max_per_img=-1)))
+train_cfg = dict(
+    assigner=dict(type='ATSSAssigner', topk=9),
+    allowed_border=-1,
+    pos_weight=-1,
+    debug=False)
+val_cfg = dict(
+    nms_pre=-1,
+    min_bbox_size=0,
+    score_thr=0.02,
+    nms=dict(type='nms', iou_threshold=0.45),
+    max_per_img=-1)
+test_cfg = dict(
+    nms_pre=-1,
+    min_bbox_size=0,
+    score_thr=0.02,
+    nms=dict(type='nms', iou_threshold=0.45),
+    max_per_img=-1)
+epoch_multi = 1
+evaluation = dict(interval=5, metric='mAP')
+work_dir = './work_dirs/scrfd_cccd_500m_bnkps_dummy'
+gpu_ids = range(0, 1)
+
+2022-08-08 05:05:00,374 - mmdet - INFO - load checkpoint from local path: /home/manhdq/ID_Card_Information_Extraction/keypoint_detection/scrfd/work_dirs/scrfd_cccd_500m_bnkps_dummy/best.pth
+2022-08-08 05:05:00,484 - mmdet - INFO - Start running, host: root@ATMA-Ubuntu20-ARP-v3, work_dir: /home/manhdq/ID_Card_Information_Extraction/keypoint_detection/scrfd/work_dirs/scrfd_cccd_500m_bnkps_dummy
+2022-08-08 05:05:00,484 - mmdet - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(NORMAL      ) CheckpointHook                     
+(NORMAL      ) DistEvalHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(NORMAL      ) DistSamplerSeedHook                
+(NORMAL      ) DistEvalHook                       
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_train_iter:
+(ABOVE_NORMAL) OptimizerHook                      
+(NORMAL      ) CheckpointHook                     
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) CheckpointHook                     
+(NORMAL      ) DistEvalHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_epoch:
+(NORMAL      ) DistSamplerSeedHook                
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_epoch:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_run:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+2022-08-08 05:05:00,485 - mmdet - INFO - workflow: [('train', 1)], max: 64 epochs
+2022-08-08 05:05:00,485 - mmdet - INFO - Checkpoints will be saved to /home/manhdq/ID_Card_Information_Extraction/keypoint_detection/scrfd/work_dirs/scrfd_cccd_500m_bnkps_dummy by HardDiskBackend.
+2022-08-08 05:07:37,481 - mmdet - INFO - Saving checkpoint at 5 epochs
+2022-08-08 05:07:48,896 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 175 | 2390 | 0.989  | 0.960 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.960 |
++-------+-----+------+--------+-------+
+2022-08-08 05:07:48,934 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_dummy.py
+2022-08-08 05:07:48,934 - mmdet - INFO - Epoch(val) [5][11]	mAP: 0.9597
+2022-08-08 05:10:26,258 - mmdet - INFO - Saving checkpoint at 10 epochs
+2022-08-08 05:10:37,676 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 175 | 2493 | 0.989  | 0.969 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.969 |
++-------+-----+------+--------+-------+
+2022-08-08 05:10:37,708 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_dummy.py
+2022-08-08 05:10:37,708 - mmdet - INFO - Epoch(val) [10][11]	mAP: 0.9686
+2022-08-08 05:13:14,041 - mmdet - INFO - Saving checkpoint at 15 epochs
+2022-08-08 05:13:25,466 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 175 | 2539 | 0.989  | 0.973 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.973 |
++-------+-----+------+--------+-------+
+2022-08-08 05:13:25,505 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_dummy.py
+2022-08-08 05:13:25,506 - mmdet - INFO - Epoch(val) [15][11]	mAP: 0.9734
+2022-08-08 05:16:02,151 - mmdet - INFO - Saving checkpoint at 20 epochs
+2022-08-08 05:16:13,575 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 175 | 2548 | 0.994  | 0.981 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.981 |
++-------+-----+------+--------+-------+
+2022-08-08 05:16:13,616 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_dummy.py
+2022-08-08 05:16:13,617 - mmdet - INFO - Epoch(val) [20][11]	mAP: 0.9814
+2022-08-08 05:18:49,630 - mmdet - INFO - Saving checkpoint at 25 epochs
+2022-08-08 05:19:00,818 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 175 | 2478 | 0.994  | 0.985 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.985 |
++-------+-----+------+--------+-------+
+2022-08-08 05:19:00,858 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_dummy.py
+2022-08-08 05:19:00,859 - mmdet - INFO - Epoch(val) [25][11]	mAP: 0.9853
+2022-08-08 05:21:38,786 - mmdet - INFO - Saving checkpoint at 30 epochs
+2022-08-08 05:21:50,031 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 175 | 2517 | 0.994  | 0.986 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.986 |
++-------+-----+------+--------+-------+
+2022-08-08 05:21:50,064 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_dummy.py
+2022-08-08 05:21:50,064 - mmdet - INFO - Epoch(val) [30][11]	mAP: 0.9855
+2022-08-08 05:24:25,099 - mmdet - INFO - Saving checkpoint at 35 epochs
+2022-08-08 05:24:36,368 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 175 | 2605 | 0.994  | 0.987 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.987 |
++-------+-----+------+--------+-------+
+2022-08-08 05:24:36,406 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_dummy.py
+2022-08-08 05:24:36,406 - mmdet - INFO - Epoch(val) [35][11]	mAP: 0.9874
+2022-08-08 05:27:11,890 - mmdet - INFO - Saving checkpoint at 40 epochs
+2022-08-08 05:27:23,453 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 175 | 2619 | 0.994  | 0.988 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.988 |
++-------+-----+------+--------+-------+
+2022-08-08 05:27:23,492 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_dummy.py
+2022-08-08 05:27:23,492 - mmdet - INFO - Epoch(val) [40][11]	mAP: 0.9881
+2022-08-08 05:30:01,481 - mmdet - INFO - Saving checkpoint at 45 epochs
+2022-08-08 05:30:13,006 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 175 | 2619 | 0.994  | 0.988 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.988 |
++-------+-----+------+--------+-------+
+2022-08-08 05:30:13,043 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_dummy.py
+2022-08-08 05:30:13,044 - mmdet - INFO - Epoch(val) [45][11]	mAP: 0.9883
+2022-08-08 05:32:47,268 - mmdet - INFO - Saving checkpoint at 50 epochs
+2022-08-08 05:32:58,578 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 175 | 2623 | 0.994  | 0.988 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.988 |
++-------+-----+------+--------+-------+
+2022-08-08 05:32:58,614 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_dummy.py
+2022-08-08 05:32:58,615 - mmdet - INFO - Epoch(val) [50][11]	mAP: 0.9882
+2022-08-08 05:35:33,353 - mmdet - INFO - Saving checkpoint at 55 epochs
+2022-08-08 05:35:44,747 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 175 | 2631 | 0.994  | 0.988 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.988 |
++-------+-----+------+--------+-------+
+2022-08-08 05:35:44,788 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_dummy.py
+2022-08-08 05:35:44,789 - mmdet - INFO - Epoch(val) [55][11]	mAP: 0.9877
+2022-08-08 05:38:19,042 - mmdet - INFO - Saving checkpoint at 60 epochs
+2022-08-08 05:38:30,276 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 175 | 2597 | 0.994  | 0.988 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.988 |
++-------+-----+------+--------+-------+
+2022-08-08 05:38:30,313 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_dummy.py
+2022-08-08 05:38:30,313 - mmdet - INFO - Epoch(val) [60][11]	mAP: 0.9883
+2022-08-08 05:40:34,244 - mmdet - INFO - Saving checkpoint at 64 epochs

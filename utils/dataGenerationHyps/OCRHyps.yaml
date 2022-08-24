@@ -1,0 +1,18 @@
+# kpts model options
+kpts_checkpoint: 'ckpts/keypoint_detector_weights/final_500m_kpts_weights'  # keypoint ckpt model dir
+kpts_thr: 0.6  # kpts confidence threshold
+kpts_out_width: 500  # kpts output width
+kpts_out_height: 300 # kpts output height
+
+# line model options
+labelmap: 'ckpts/line_detector_weights/labelmap.txt'  # label infos file
+line_model_bacbone: 'resnet50'  # line model backbone
+line_model_encoder_pretrained: 'imagenet'  # line model pretrained for backbone
+line_checkpoint: 'ckpts/line_detector_weights/resnet50'  # line ckpt model dir
+ignores_list: ['background', 'bg']  # ignored class from labelmap
+
+# other options
+save_dir: 'DatasetGeneration/OCR/cmt'  # save directory for information extraction
+save_generated_card: True
+no_gpu: False   # unable gpu
+delay: 100  # delay time for real time scanning

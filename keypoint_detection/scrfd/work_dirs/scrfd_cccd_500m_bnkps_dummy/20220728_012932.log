@@ -1,0 +1,428 @@
+2022-07-28 01:29:32,935 - mmdet - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.9.11 (main, Mar 29 2022, 19:08:29) [GCC 7.5.0]
+CUDA available: True
+GPU 0: Tesla T4
+CUDA_HOME: /root/miniconda3/envs/manhdq
+NVCC: Cuda compilation tools, release 11.3, V11.3.58
+GCC: gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0
+PyTorch: 1.11.0+cu113
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) Math Kernel Library Version 2020.0.0 Product Build 20191122 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.5.2 (Git Hash a9302535553c73243c632ad3c4c80beec3d19a1e)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.3
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86
+  - CuDNN 8.2
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.3, CUDNN_VERSION=8.2.0, CXX_COMPILER=/opt/rh/devtoolset-7/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DEDGE_PROFILER_USE_KINETO -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.11.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=OFF, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+TorchVision: 0.12.0+cu113
+OpenCV: 4.4.0
+MMCV: 1.5.3
+MMCV Compiler: n/a
+MMCV CUDA Compiler: n/a
+MMDetection: 2.7.0+
+------------------------------------------------------------
+
+2022-07-28 01:29:33,876 - mmdet - INFO - Distributed training: True
+2022-07-28 01:29:34,819 - mmdet - INFO - Config:
+optimizer = dict(type='Adam', lr=0.000625, weight_decay=0.0005)
+optimizer_config = dict(grad_clip=None)
+lr_mult = 8
+lr_config = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=10,
+    warmup_ratio=0.001,
+    step=[32, 48])
+total_epochs = 64
+checkpoint_config = dict(interval=5)
+log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = '/home/manhdq/ID_Card_Information_Extraction/ckpts/keypoint_detector_weights/cmt_final_500m_kpts_weights/best.pth'
+resume_from = None
+workflow = [('train', 1)]
+dataset_type = 'RetinaFaceDataset'
+data_root = '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd'
+train_root = '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/dummy_v1'
+val_root = '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean'
+img_norm_cfg = dict(
+    mean=[127.5, 127.5, 127.5], std=[128.0, 128.0, 128.0], to_rgb=True)
+albu_train_transforms = [
+    dict(
+        type='OneOf',
+        transforms=[
+            dict(
+                type='Affine',
+                scale=None,
+                rotate=(-90, 90),
+                shear=None,
+                interpolation=0,
+                fit_output=True)
+        ],
+        p=0.6),
+    dict(
+        type='OneOf',
+        transforms=[
+            dict(type='MotionBlur'),
+            dict(type='GaussianBlur', blur_limit=3)
+        ],
+        p=0.2),
+    dict(type='ToGray', p=0.2)
+]
+train_pipeline = [
+    dict(type='LoadImageFromFile', to_float32=True),
+    dict(type='LoadAnnotations', with_bbox=True, with_keypoints=True),
+    dict(
+        type='RandomSquareCrop',
+        crop_choice=[0.3, 0.45, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0]),
+    dict(type='Resize', img_scale=(640, 640), keep_ratio=False),
+    dict(
+        type='RandomFlip',
+        flip_ratio=0.5,
+        direction=['horizontal', 'vertical', 'diagonal']),
+    dict(
+        type='PhotoMetricDistortion',
+        brightness_delta=32,
+        contrast_range=(0.5, 1.5),
+        saturation_range=(0.5, 1.5),
+        hue_delta=18),
+    dict(
+        type='Normalize',
+        mean=[127.5, 127.5, 127.5],
+        std=[128.0, 128.0, 128.0],
+        to_rgb=True),
+    dict(type='DefaultFormatBundle'),
+    dict(
+        type='Collect',
+        keys=[
+            'img', 'gt_bboxes', 'gt_labels', 'gt_bboxes_ignore',
+            'gt_keypointss'
+        ])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=(640, 640),
+        flip=False,
+        transforms=[
+            dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip', flip_ratio=0.0),
+            dict(
+                type='Normalize',
+                mean=[127.5, 127.5, 127.5],
+                std=[128.0, 128.0, 128.0],
+                to_rgb=True),
+            dict(type='Pad', size=(640, 640), pad_val=0),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ])
+]
+data = dict(
+    samples_per_gpu=32,
+    workers_per_gpu=8,
+    train=dict(
+        type='RetinaFaceDataset',
+        ann_file=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/dummy_v1/annotations.txt',
+        img_prefix=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/dummy_v1/images',
+        pipeline=[
+            dict(type='LoadImageFromFile', to_float32=True),
+            dict(type='LoadAnnotations', with_bbox=True, with_keypoints=True),
+            dict(
+                type='RandomSquareCrop',
+                crop_choice=[
+                    0.3, 0.45, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0
+                ]),
+            dict(type='Resize', img_scale=(640, 640), keep_ratio=False),
+            dict(
+                type='RandomFlip',
+                flip_ratio=0.5,
+                direction=['horizontal', 'vertical', 'diagonal']),
+            dict(
+                type='PhotoMetricDistortion',
+                brightness_delta=32,
+                contrast_range=(0.5, 1.5),
+                saturation_range=(0.5, 1.5),
+                hue_delta=18),
+            dict(
+                type='Normalize',
+                mean=[127.5, 127.5, 127.5],
+                std=[128.0, 128.0, 128.0],
+                to_rgb=True),
+            dict(type='DefaultFormatBundle'),
+            dict(
+                type='Collect',
+                keys=[
+                    'img', 'gt_bboxes', 'gt_labels', 'gt_bboxes_ignore',
+                    'gt_keypointss'
+                ])
+        ]),
+    val=dict(
+        type='RetinaFaceDataset',
+        ann_file=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean/annotations.txt',
+        img_prefix=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean/images',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', with_bbox=True, with_keypoints=True),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(640, 640),
+                flip=False,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip', flip_ratio=0.0),
+                    dict(
+                        type='Normalize',
+                        mean=[127.5, 127.5, 127.5],
+                        std=[128.0, 128.0, 128.0],
+                        to_rgb=True),
+                    dict(type='Pad', size=(640, 640), pad_val=0),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(
+                        type='Collect',
+                        keys=[
+                            'img', 'gt_bboxes', 'gt_labels',
+                            'gt_bboxes_ignore', 'gt_keypointss'
+                        ])
+                ])
+        ]),
+    infer=dict(
+        type='RetinaFaceDataset',
+        ann_file=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean/annotations.txt',
+        img_prefix=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean/images',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', with_bbox=True, with_keypoints=True),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(640, 640),
+                flip=False,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip', flip_ratio=0.0),
+                    dict(
+                        type='Normalize',
+                        mean=[127.5, 127.5, 127.5],
+                        std=[128.0, 128.0, 128.0],
+                        to_rgb=True),
+                    dict(type='Pad', size=(640, 640), pad_val=0),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(
+                        type='Collect',
+                        keys=[
+                            'img', 'gt_bboxes', 'gt_labels',
+                            'gt_bboxes_ignore', 'gt_keypointss'
+                        ])
+                ])
+        ]),
+    test=dict(
+        type='RetinaFaceDataset',
+        ann_file=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean/annotations.txt',
+        img_prefix=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean/images',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(640, 640),
+                flip=False,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip', flip_ratio=0.0),
+                    dict(
+                        type='Normalize',
+                        mean=[127.5, 127.5, 127.5],
+                        std=[128.0, 128.0, 128.0],
+                        to_rgb=True),
+                    dict(type='Pad', size=(640, 640), pad_val=0),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]))
+model = dict(
+    type='SCRFD',
+    backbone=dict(
+        type='MobileNetV1',
+        block_cfg=dict(
+            stage_blocks=(2, 3, 2, 6), stage_planes=[16, 16, 40, 72, 152,
+                                                     288])),
+    neck=dict(
+        type='PAFPN',
+        in_channels=[40, 72, 152, 288],
+        out_channels=16,
+        start_level=1,
+        add_extra_convs='on_output',
+        num_outs=3),
+    bbox_head=dict(
+        type='SCRFDHead',
+        num_classes=1,
+        in_channels=16,
+        stacked_convs=2,
+        feat_channels=64,
+        norm_cfg=dict(type='BN', requires_grad=True),
+        cls_reg_share=True,
+        strides_share=False,
+        dw_conv=True,
+        scale_mode=0,
+        anchor_generator=dict(
+            type='AnchorGenerator',
+            ratios=[1.0],
+            scales=[1, 2],
+            base_sizes=[16, 64, 256],
+            strides=[8, 16, 32]),
+        loss_cls=dict(
+            type='QualityFocalLoss',
+            use_sigmoid=True,
+            beta=2.0,
+            loss_weight=1.0),
+        loss_dfl=False,
+        reg_max=8,
+        loss_bbox=dict(type='DIoULoss', loss_weight=1.0),
+        use_kps=True,
+        loss_kps=dict(
+            type='SmoothL1Loss', beta=0.1111111111111111, loss_weight=1.5),
+        train_cfg=dict(
+            assigner=dict(type='ATSSAssigner', topk=9),
+            allowed_border=-1,
+            pos_weight=-1,
+            debug=False),
+        test_cfg=dict(
+            nms_pre=-1,
+            min_bbox_size=0,
+            score_thr=0.02,
+            nms=dict(type='nms', iou_threshold=0.45),
+            max_per_img=-1)))
+train_cfg = dict(
+    assigner=dict(type='ATSSAssigner', topk=9),
+    allowed_border=-1,
+    pos_weight=-1,
+    debug=False)
+val_cfg = dict(
+    nms_pre=-1,
+    min_bbox_size=0,
+    score_thr=0.02,
+    nms=dict(type='nms', iou_threshold=0.45),
+    max_per_img=-1)
+test_cfg = dict(
+    nms_pre=-1,
+    min_bbox_size=0,
+    score_thr=0.02,
+    nms=dict(type='nms', iou_threshold=0.45),
+    max_per_img=-1)
+epoch_multi = 1
+evaluation = dict(interval=5, metric='mAP')
+work_dir = './work_dirs/scrfd_cccd_500m_bnkps_dummy'
+gpu_ids = range(0, 1)
+
+2022-07-28 01:29:38,687 - mmdet - INFO - load checkpoint from local path: /home/manhdq/ID_Card_Information_Extraction/ckpts/keypoint_detector_weights/cmt_final_500m_kpts_weights/best.pth
+2022-07-28 01:29:38,730 - mmdet - INFO - Start running, host: root@ATMA-Ubuntu20-ARP-v3, work_dir: /home/manhdq/ID_Card_Information_Extraction/keypoint_detection/scrfd/work_dirs/scrfd_cccd_500m_bnkps_dummy
+2022-07-28 01:29:38,730 - mmdet - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(NORMAL      ) CheckpointHook                     
+(NORMAL      ) DistEvalHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(NORMAL      ) DistSamplerSeedHook                
+(NORMAL      ) DistEvalHook                       
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_train_iter:
+(ABOVE_NORMAL) OptimizerHook                      
+(NORMAL      ) CheckpointHook                     
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) CheckpointHook                     
+(NORMAL      ) DistEvalHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_epoch:
+(NORMAL      ) DistSamplerSeedHook                
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_epoch:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_run:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+2022-07-28 01:29:38,730 - mmdet - INFO - workflow: [('train', 1)], max: 64 epochs
+2022-07-28 01:29:38,730 - mmdet - INFO - Checkpoints will be saved to /home/manhdq/ID_Card_Information_Extraction/keypoint_detection/scrfd/work_dirs/scrfd_cccd_500m_bnkps_dummy by HardDiskBackend.
+2022-07-28 01:30:31,826 - mmdet - INFO - Epoch [1][50/460]	lr: 6.250e-04, eta: 8:40:08, time: 1.062, data_time: 0.611, memory: 4011, loss_cls: 0.4631, loss_bbox: 0.1388, loss_kps: 36.3337, loss: 36.9357
+2022-07-28 01:30:57,527 - mmdet - INFO - Epoch [1][100/460]	lr: 6.250e-04, eta: 6:25:17, time: 0.514, data_time: 0.062, memory: 4011, loss_cls: 0.3624, loss_bbox: 0.1376, loss_kps: 29.1231, loss: 29.6231
+2022-07-28 01:31:26,148 - mmdet - INFO - Epoch [1][150/460]	lr: 6.250e-04, eta: 5:49:34, time: 0.572, data_time: 0.067, memory: 4011, loss_cls: 0.3522, loss_bbox: 0.1380, loss_kps: 26.0439, loss: 26.5341
+2022-07-28 01:32:06,403 - mmdet - INFO - Epoch [1][200/460]	lr: 6.250e-04, eta: 5:59:49, time: 0.805, data_time: 0.062, memory: 4011, loss_cls: 0.3181, loss_bbox: 0.1269, loss_kps: 22.3721, loss: 22.8171
+2022-07-28 01:32:46,965 - mmdet - INFO - Epoch [1][250/460]	lr: 6.250e-04, eta: 6:06:17, time: 0.811, data_time: 0.066, memory: 4011, loss_cls: 0.3097, loss_bbox: 0.1290, loss_kps: 21.1044, loss: 21.5430
+2022-07-28 01:33:27,478 - mmdet - INFO - Epoch [1][300/460]	lr: 6.250e-04, eta: 6:10:18, time: 0.810, data_time: 0.059, memory: 4011, loss_cls: 0.3120, loss_bbox: 0.1271, loss_kps: 18.0986, loss: 18.5377
+2022-07-28 01:34:07,791 - mmdet - INFO - Epoch [1][350/460]	lr: 6.250e-04, eta: 6:12:42, time: 0.806, data_time: 0.058, memory: 4011, loss_cls: 0.3098, loss_bbox: 0.1269, loss_kps: 16.7662, loss: 17.2029
+2022-07-28 01:34:46,502 - mmdet - INFO - Epoch [1][400/460]	lr: 6.250e-04, eta: 6:12:23, time: 0.774, data_time: 0.060, memory: 4011, loss_cls: 0.2840, loss_bbox: 0.1265, loss_kps: 15.3888, loss: 15.7992
+2022-07-28 01:35:27,151 - mmdet - INFO - Epoch [1][450/460]	lr: 6.250e-04, eta: 6:14:05, time: 0.813, data_time: 0.065, memory: 4011, loss_cls: 0.2970, loss_bbox: 0.1210, loss_kps: 14.2683, loss: 14.6863
+2022-07-28 01:36:42,892 - mmdet - INFO - Epoch [2][50/460]	lr: 6.250e-04, eta: 6:32:51, time: 1.342, data_time: 0.588, memory: 4011, loss_cls: 0.2875, loss_bbox: 0.1172, loss_kps: 13.9411, loss: 14.3458
+2022-07-28 01:37:23,540 - mmdet - INFO - Epoch [2][100/460]	lr: 6.250e-04, eta: 6:32:06, time: 0.813, data_time: 0.061, memory: 4011, loss_cls: 0.2873, loss_bbox: 0.1190, loss_kps: 13.2751, loss: 13.6813
+2022-07-28 01:38:02,899 - mmdet - INFO - Epoch [2][150/460]	lr: 6.250e-04, eta: 6:30:20, time: 0.787, data_time: 0.058, memory: 4011, loss_cls: 0.2815, loss_bbox: 0.1134, loss_kps: 12.4077, loss: 12.8026
+2022-07-28 01:38:43,429 - mmdet - INFO - Epoch [2][200/460]	lr: 6.250e-04, eta: 6:29:35, time: 0.811, data_time: 0.066, memory: 4011, loss_cls: 0.2700, loss_bbox: 0.1135, loss_kps: 13.2244, loss: 13.6078
+2022-07-28 01:39:24,272 - mmdet - INFO - Epoch [2][250/460]	lr: 6.250e-04, eta: 6:29:04, time: 0.817, data_time: 0.064, memory: 4011, loss_cls: 0.2764, loss_bbox: 0.1129, loss_kps: 11.2886, loss: 11.6779
+2022-07-28 01:40:05,142 - mmdet - INFO - Epoch [2][300/460]	lr: 6.250e-04, eta: 6:28:33, time: 0.817, data_time: 0.061, memory: 4011, loss_cls: 0.2677, loss_bbox: 0.1110, loss_kps: 10.9069, loss: 11.2856
+2022-07-28 01:40:43,751 - mmdet - INFO - Epoch [2][350/460]	lr: 6.250e-04, eta: 6:26:40, time: 0.772, data_time: 0.059, memory: 4011, loss_cls: 0.2658, loss_bbox: 0.1078, loss_kps: 11.5608, loss: 11.9344
+2022-07-28 01:41:25,142 - mmdet - INFO - Epoch [2][400/460]	lr: 6.250e-04, eta: 6:26:29, time: 0.828, data_time: 0.061, memory: 4011, loss_cls: 0.2602, loss_bbox: 0.1090, loss_kps: 11.2836, loss: 11.6528
+2022-07-28 01:41:58,470 - mmdet - INFO - Epoch [2][450/460]	lr: 6.250e-04, eta: 6:22:01, time: 0.667, data_time: 0.069, memory: 4011, loss_cls: 0.2558, loss_bbox: 0.1101, loss_kps: 11.6323, loss: 11.9982
+2022-07-28 01:42:56,772 - mmdet - INFO - Epoch [3][50/460]	lr: 6.250e-04, eta: 6:23:31, time: 1.058, data_time: 0.604, memory: 4011, loss_cls: 0.2624, loss_bbox: 0.1070, loss_kps: 11.2307, loss: 11.6002
+2022-07-28 01:43:22,548 - mmdet - INFO - Epoch [3][100/460]	lr: 6.250e-04, eta: 6:16:03, time: 0.516, data_time: 0.062, memory: 4011, loss_cls: 0.2629, loss_bbox: 0.1063, loss_kps: 10.8281, loss: 11.1973
+2022-07-28 01:43:48,530 - mmdet - INFO - Epoch [3][150/460]	lr: 6.250e-04, eta: 6:09:20, time: 0.520, data_time: 0.062, memory: 4011, loss_cls: 0.2516, loss_bbox: 0.1043, loss_kps: 11.3573, loss: 11.7131
+2022-07-28 01:44:14,353 - mmdet - INFO - Epoch [3][200/460]	lr: 6.250e-04, eta: 6:03:06, time: 0.516, data_time: 0.063, memory: 4011, loss_cls: 0.2465, loss_bbox: 0.1035, loss_kps: 9.5063, loss: 9.8563
+2022-07-28 01:44:40,124 - mmdet - INFO - Epoch [3][250/460]	lr: 6.250e-04, eta: 5:57:21, time: 0.515, data_time: 0.065, memory: 4011, loss_cls: 0.2493, loss_bbox: 0.1020, loss_kps: 10.3344, loss: 10.6857
+2022-07-28 01:45:06,175 - mmdet - INFO - Epoch [3][300/460]	lr: 6.250e-04, eta: 5:52:08, time: 0.521, data_time: 0.066, memory: 4011, loss_cls: 0.2478, loss_bbox: 0.0999, loss_kps: 9.2820, loss: 9.6297
+2022-07-28 01:45:32,074 - mmdet - INFO - Epoch [3][350/460]	lr: 6.250e-04, eta: 5:47:15, time: 0.518, data_time: 0.062, memory: 4011, loss_cls: 0.2550, loss_bbox: 0.1034, loss_kps: 9.9407, loss: 10.2991
+2022-07-28 01:45:58,270 - mmdet - INFO - Epoch [3][400/460]	lr: 6.250e-04, eta: 5:42:48, time: 0.524, data_time: 0.066, memory: 4011, loss_cls: 0.2472, loss_bbox: 0.0999, loss_kps: 8.9042, loss: 9.2513
+2022-07-28 01:46:24,293 - mmdet - INFO - Epoch [3][450/460]	lr: 6.250e-04, eta: 5:38:35, time: 0.520, data_time: 0.067, memory: 4011, loss_cls: 0.2482, loss_bbox: 0.0985, loss_kps: 10.0772, loss: 10.4239
+2022-07-28 01:47:22,961 - mmdet - INFO - Epoch [4][50/460]	lr: 6.250e-04, eta: 5:41:04, time: 1.064, data_time: 0.609, memory: 4011, loss_cls: 0.2472, loss_bbox: 0.0987, loss_kps: 10.0033, loss: 10.3492
+2022-07-28 01:47:49,180 - mmdet - INFO - Epoch [4][100/460]	lr: 6.250e-04, eta: 5:37:12, time: 0.524, data_time: 0.068, memory: 4011, loss_cls: 0.2416, loss_bbox: 0.1009, loss_kps: 8.3423, loss: 8.6848
+2022-07-28 01:48:19,945 - mmdet - INFO - Epoch [4][150/460]	lr: 6.250e-04, eta: 5:34:57, time: 0.615, data_time: 0.062, memory: 4011, loss_cls: 0.2517, loss_bbox: 0.0973, loss_kps: 9.6770, loss: 10.0260
+2022-07-28 01:49:00,047 - mmdet - INFO - Epoch [4][200/460]	lr: 6.250e-04, eta: 5:35:34, time: 0.802, data_time: 0.063, memory: 4011, loss_cls: 0.2398, loss_bbox: 0.0956, loss_kps: 9.6064, loss: 9.9417
+2022-07-28 01:49:41,366 - mmdet - INFO - Epoch [4][250/460]	lr: 6.250e-04, eta: 5:36:26, time: 0.826, data_time: 0.062, memory: 4011, loss_cls: 0.2408, loss_bbox: 0.0959, loss_kps: 9.2468, loss: 9.5835
+2022-07-28 01:50:22,163 - mmdet - INFO - Epoch [4][300/460]	lr: 6.250e-04, eta: 5:37:04, time: 0.816, data_time: 0.062, memory: 4011, loss_cls: 0.2316, loss_bbox: 0.0968, loss_kps: 9.4895, loss: 9.8178
+2022-07-28 01:51:02,725 - mmdet - INFO - Epoch [4][350/460]	lr: 6.250e-04, eta: 5:37:34, time: 0.811, data_time: 0.057, memory: 4011, loss_cls: 0.2325, loss_bbox: 0.0983, loss_kps: 8.9468, loss: 9.2776
+2022-07-28 01:51:41,791 - mmdet - INFO - Epoch [4][400/460]	lr: 6.250e-04, eta: 5:37:36, time: 0.781, data_time: 0.060, memory: 4011, loss_cls: 0.2405, loss_bbox: 0.0965, loss_kps: 8.5044, loss: 8.8413
+2022-07-28 01:52:23,436 - mmdet - INFO - Epoch [4][450/460]	lr: 6.250e-04, eta: 5:38:16, time: 0.833, data_time: 0.063, memory: 4011, loss_cls: 0.2314, loss_bbox: 0.0949, loss_kps: 8.6748, loss: 9.0011
+2022-07-28 01:53:40,236 - mmdet - INFO - Epoch [5][50/460]	lr: 6.250e-04, eta: 5:43:20, time: 1.361, data_time: 0.601, memory: 4011, loss_cls: 0.2357, loss_bbox: 0.0929, loss_kps: 8.7125, loss: 9.0411
+2022-07-28 01:54:20,890 - mmdet - INFO - Epoch [5][100/460]	lr: 6.250e-04, eta: 5:43:29, time: 0.813, data_time: 0.061, memory: 4011, loss_cls: 0.2349, loss_bbox: 0.0931, loss_kps: 8.8462, loss: 9.1743
+2022-07-28 01:54:59,952 - mmdet - INFO - Epoch [5][150/460]	lr: 6.250e-04, eta: 5:43:14, time: 0.781, data_time: 0.063, memory: 4011, loss_cls: 0.2354, loss_bbox: 0.0970, loss_kps: 8.9303, loss: 9.2627
+2022-07-28 01:55:40,760 - mmdet - INFO - Epoch [5][200/460]	lr: 6.250e-04, eta: 5:43:20, time: 0.816, data_time: 0.058, memory: 4011, loss_cls: 0.2416, loss_bbox: 0.0939, loss_kps: 9.0335, loss: 9.3689
+2022-07-28 01:56:21,111 - mmdet - INFO - Epoch [5][250/460]	lr: 6.250e-04, eta: 5:43:19, time: 0.807, data_time: 0.064, memory: 4011, loss_cls: 0.2327, loss_bbox: 0.0926, loss_kps: 7.8275, loss: 8.1528
+2022-07-28 01:57:01,681 - mmdet - INFO - Epoch [5][300/460]	lr: 6.250e-04, eta: 5:43:18, time: 0.811, data_time: 0.062, memory: 4011, loss_cls: 0.2303, loss_bbox: 0.0914, loss_kps: 7.7031, loss: 8.0247
+2022-07-28 01:57:41,781 - mmdet - INFO - Epoch [5][350/460]	lr: 6.250e-04, eta: 5:43:10, time: 0.802, data_time: 0.062, memory: 4011, loss_cls: 0.2257, loss_bbox: 0.0918, loss_kps: 7.5929, loss: 7.9104
+2022-07-28 01:58:22,129 - mmdet - INFO - Epoch [5][400/460]	lr: 6.250e-04, eta: 5:43:03, time: 0.807, data_time: 0.061, memory: 4011, loss_cls: 0.2271, loss_bbox: 0.0900, loss_kps: 7.4453, loss: 7.7624
+2022-07-28 01:58:51,399 - mmdet - INFO - Epoch [5][450/460]	lr: 6.250e-04, eta: 5:40:44, time: 0.585, data_time: 0.068, memory: 4011, loss_cls: 0.2296, loss_bbox: 0.0902, loss_kps: 8.0726, loss: 8.3924
+2022-07-28 01:58:56,896 - mmdet - INFO - Saving checkpoint at 5 epochs

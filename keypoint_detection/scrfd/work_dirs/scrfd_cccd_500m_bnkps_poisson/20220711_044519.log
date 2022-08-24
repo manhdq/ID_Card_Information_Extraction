@@ -1,0 +1,734 @@
+2022-07-11 04:45:19,654 - mmdet - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.9.11 (main, Mar 29 2022, 19:08:29) [GCC 7.5.0]
+CUDA available: True
+GPU 0,1: Tesla T4
+CUDA_HOME: /root/miniconda3/envs/manhdq
+NVCC: Cuda compilation tools, release 11.3, V11.3.58
+GCC: gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0
+PyTorch: 1.11.0+cu113
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) Math Kernel Library Version 2020.0.0 Product Build 20191122 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.5.2 (Git Hash a9302535553c73243c632ad3c4c80beec3d19a1e)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.3
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86
+  - CuDNN 8.2
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.3, CUDNN_VERSION=8.2.0, CXX_COMPILER=/opt/rh/devtoolset-7/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DEDGE_PROFILER_USE_KINETO -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.11.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=OFF, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+TorchVision: 0.12.0+cu113
+OpenCV: 4.4.0
+MMCV: 1.5.3
+MMCV Compiler: n/a
+MMCV CUDA Compiler: n/a
+MMDetection: 2.7.0+
+------------------------------------------------------------
+
+2022-07-11 04:45:20,496 - mmdet - INFO - Distributed training: False
+2022-07-11 04:45:21,273 - mmdet - INFO - Config:
+optimizer = dict(type='Adam', lr=0.000625, weight_decay=0.0005)
+optimizer_config = dict(grad_clip=None)
+lr_mult = 8
+lr_config = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=10,
+    warmup_ratio=0.001,
+    step=[32, 48])
+total_epochs = 64
+checkpoint_config = dict(interval=5)
+log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = '/home/manhdq/ID_Card_Information_Extraction/ckpts/keypoint_detector_weights/final_500m_kpts_weights/best.pth'
+resume_from = None
+workflow = [('train', 1)]
+dataset_type = 'RetinaFaceDataset'
+data_root = '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd'
+train_root = '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/poisson_v1'
+val_root = '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean'
+img_norm_cfg = dict(
+    mean=[127.5, 127.5, 127.5], std=[128.0, 128.0, 128.0], to_rgb=True)
+albu_train_transforms = [
+    dict(
+        type='OneOf',
+        transforms=[
+            dict(
+                type='Affine',
+                scale=None,
+                rotate=(-90, 90),
+                shear=None,
+                interpolation=0,
+                fit_output=True)
+        ],
+        p=0.6),
+    dict(
+        type='OneOf',
+        transforms=[
+            dict(type='MotionBlur'),
+            dict(type='GaussianBlur', blur_limit=3)
+        ],
+        p=0.2),
+    dict(type='ToGray', p=0.2)
+]
+train_pipeline = [
+    dict(type='LoadImageFromFile', to_float32=True),
+    dict(type='LoadAnnotations', with_bbox=True, with_keypoints=True),
+    dict(
+        type='RandomSquareCrop',
+        crop_choice=[0.3, 0.45, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0]),
+    dict(type='Resize', img_scale=(640, 640), keep_ratio=False),
+    dict(
+        type='RandomFlip',
+        flip_ratio=0.5,
+        direction=['horizontal', 'vertical', 'diagonal']),
+    dict(
+        type='PhotoMetricDistortion',
+        brightness_delta=32,
+        contrast_range=(0.5, 1.5),
+        saturation_range=(0.5, 1.5),
+        hue_delta=18),
+    dict(
+        type='Normalize',
+        mean=[127.5, 127.5, 127.5],
+        std=[128.0, 128.0, 128.0],
+        to_rgb=True),
+    dict(type='DefaultFormatBundle'),
+    dict(
+        type='Collect',
+        keys=[
+            'img', 'gt_bboxes', 'gt_labels', 'gt_bboxes_ignore',
+            'gt_keypointss'
+        ])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=(640, 640),
+        flip=False,
+        transforms=[
+            dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip', flip_ratio=0.0),
+            dict(
+                type='Normalize',
+                mean=[127.5, 127.5, 127.5],
+                std=[128.0, 128.0, 128.0],
+                to_rgb=True),
+            dict(type='Pad', size=(640, 640), pad_val=0),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ])
+]
+data = dict(
+    samples_per_gpu=64,
+    workers_per_gpu=8,
+    train=dict(
+        type='RetinaFaceDataset',
+        ann_file=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/poisson_v1/annotations.txt',
+        img_prefix=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/poisson_v1/images',
+        pipeline=[
+            dict(type='LoadImageFromFile', to_float32=True),
+            dict(type='LoadAnnotations', with_bbox=True, with_keypoints=True),
+            dict(
+                type='RandomSquareCrop',
+                crop_choice=[
+                    0.3, 0.45, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0
+                ]),
+            dict(type='Resize', img_scale=(640, 640), keep_ratio=False),
+            dict(
+                type='RandomFlip',
+                flip_ratio=0.5,
+                direction=['horizontal', 'vertical', 'diagonal']),
+            dict(
+                type='PhotoMetricDistortion',
+                brightness_delta=32,
+                contrast_range=(0.5, 1.5),
+                saturation_range=(0.5, 1.5),
+                hue_delta=18),
+            dict(
+                type='Normalize',
+                mean=[127.5, 127.5, 127.5],
+                std=[128.0, 128.0, 128.0],
+                to_rgb=True),
+            dict(type='DefaultFormatBundle'),
+            dict(
+                type='Collect',
+                keys=[
+                    'img', 'gt_bboxes', 'gt_labels', 'gt_bboxes_ignore',
+                    'gt_keypointss'
+                ])
+        ]),
+    val=dict(
+        type='RetinaFaceDataset',
+        ann_file=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean/annotations.txt',
+        img_prefix=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean/images',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', with_bbox=True, with_keypoints=True),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(640, 640),
+                flip=False,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip', flip_ratio=0.0),
+                    dict(
+                        type='Normalize',
+                        mean=[127.5, 127.5, 127.5],
+                        std=[128.0, 128.0, 128.0],
+                        to_rgb=True),
+                    dict(type='Pad', size=(640, 640), pad_val=0),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]),
+    test=dict(
+        type='RetinaFaceDataset',
+        ann_file=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean/annotations.txt',
+        img_prefix=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cccd/valid_cccd_clean/images',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(640, 640),
+                flip=False,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip', flip_ratio=0.0),
+                    dict(
+                        type='Normalize',
+                        mean=[127.5, 127.5, 127.5],
+                        std=[128.0, 128.0, 128.0],
+                        to_rgb=True),
+                    dict(type='Pad', size=(640, 640), pad_val=0),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]))
+model = dict(
+    type='SCRFD',
+    backbone=dict(
+        type='MobileNetV1',
+        block_cfg=dict(
+            stage_blocks=(2, 3, 2, 6), stage_planes=[16, 16, 40, 72, 152,
+                                                     288])),
+    neck=dict(
+        type='PAFPN',
+        in_channels=[40, 72, 152, 288],
+        out_channels=16,
+        start_level=1,
+        add_extra_convs='on_output',
+        num_outs=3),
+    bbox_head=dict(
+        type='SCRFDHead',
+        num_classes=1,
+        in_channels=16,
+        stacked_convs=2,
+        feat_channels=64,
+        norm_cfg=dict(type='BN', requires_grad=True),
+        cls_reg_share=True,
+        strides_share=False,
+        dw_conv=True,
+        scale_mode=0,
+        anchor_generator=dict(
+            type='AnchorGenerator',
+            ratios=[1.0],
+            scales=[1, 2],
+            base_sizes=[16, 64, 256],
+            strides=[8, 16, 32]),
+        loss_cls=dict(
+            type='QualityFocalLoss',
+            use_sigmoid=True,
+            beta=2.0,
+            loss_weight=1.0),
+        loss_dfl=False,
+        reg_max=8,
+        loss_bbox=dict(type='DIoULoss', loss_weight=1.0),
+        use_kps=True,
+        loss_kps=dict(
+            type='SmoothL1Loss', beta=0.1111111111111111, loss_weight=1.5),
+        train_cfg=dict(
+            assigner=dict(type='ATSSAssigner', topk=9),
+            allowed_border=-1,
+            pos_weight=-1,
+            debug=False),
+        test_cfg=dict(
+            nms_pre=-1,
+            min_bbox_size=0,
+            score_thr=0.02,
+            nms=dict(type='nms', iou_threshold=0.45),
+            max_per_img=-1)))
+train_cfg = dict(
+    assigner=dict(type='ATSSAssigner', topk=9),
+    allowed_border=-1,
+    pos_weight=-1,
+    debug=False)
+val_cfg = dict(
+    nms_pre=-1,
+    min_bbox_size=0,
+    score_thr=0.02,
+    nms=dict(type='nms', iou_threshold=0.45),
+    max_per_img=-1)
+test_cfg = dict(
+    nms_pre=-1,
+    min_bbox_size=0,
+    score_thr=0.02,
+    nms=dict(type='nms', iou_threshold=0.45),
+    max_per_img=-1)
+epoch_multi = 1
+evaluation = dict(interval=5, metric='mAP')
+work_dir = './work_dirs/scrfd_cccd_500m_bnkps_poisson'
+gpu_ids = range(0, 1)
+
+2022-07-11 04:45:21,273 - mmdet - INFO - Set random seed to 42, deterministic: False
+2022-07-11 04:45:25,129 - mmdet - INFO - load checkpoint from local path: /home/manhdq/ID_Card_Information_Extraction/ckpts/keypoint_detector_weights/final_500m_kpts_weights/best.pth
+2022-07-11 04:45:25,179 - mmdet - INFO - Start running, host: root@ATMA-Ubuntu20-ARP-v3, work_dir: /home/manhdq/ID_Card_Information_Extraction/keypoint_detection/scrfd/work_dirs/scrfd_cccd_500m_bnkps_poisson
+2022-07-11 04:45:25,179 - mmdet - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(NORMAL      ) CheckpointHook                     
+(NORMAL      ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(NORMAL      ) EvalHook                           
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_train_iter:
+(ABOVE_NORMAL) OptimizerHook                      
+(NORMAL      ) CheckpointHook                     
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) CheckpointHook                     
+(NORMAL      ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_epoch:
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_epoch:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_run:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+2022-07-11 04:45:25,179 - mmdet - INFO - workflow: [('train', 1)], max: 64 epochs
+2022-07-11 04:45:25,180 - mmdet - INFO - Checkpoints will be saved to /home/manhdq/ID_Card_Information_Extraction/keypoint_detection/scrfd/work_dirs/scrfd_cccd_500m_bnkps_poisson by HardDiskBackend.
+2022-07-11 04:46:21,812 - mmdet - INFO - Epoch [1][50/241]	lr: 6.250e-04, eta: 4:50:12, time: 1.133, data_time: 0.259, memory: 7994, loss_cls: 0.2726, loss_bbox: 0.0980, loss_kps: 32.6831, loss: 33.0536
+2022-07-11 04:47:11,603 - mmdet - INFO - Epoch [1][100/241]	lr: 6.250e-04, eta: 4:31:47, time: 0.996, data_time: 0.133, memory: 7994, loss_cls: 0.2589, loss_bbox: 0.1067, loss_kps: 25.9679, loss: 26.3334
+2022-07-11 04:48:02,634 - mmdet - INFO - Epoch [1][150/241]	lr: 6.250e-04, eta: 4:27:12, time: 1.021, data_time: 0.121, memory: 7994, loss_cls: 0.2496, loss_bbox: 0.1033, loss_kps: 21.9024, loss: 22.2554
+2022-07-11 04:48:53,281 - mmdet - INFO - Epoch [1][200/241]	lr: 6.250e-04, eta: 4:24:00, time: 1.013, data_time: 0.123, memory: 7994, loss_cls: 0.2538, loss_bbox: 0.1048, loss_kps: 20.9718, loss: 21.3304
+2022-07-11 04:50:36,395 - mmdet - INFO - Epoch [2][50/241]	lr: 6.250e-04, eta: 3:52:43, time: 1.208, data_time: 0.260, memory: 7994, loss_cls: 0.2399, loss_bbox: 0.1012, loss_kps: 16.3636, loss: 16.7048
+2022-07-11 04:51:27,109 - mmdet - INFO - Epoch [2][100/241]	lr: 6.250e-04, eta: 3:55:19, time: 1.014, data_time: 0.136, memory: 7994, loss_cls: 0.2375, loss_bbox: 0.0987, loss_kps: 14.8226, loss: 15.1588
+2022-07-11 04:52:19,079 - mmdet - INFO - Epoch [2][150/241]	lr: 6.250e-04, eta: 3:57:51, time: 1.039, data_time: 0.124, memory: 7994, loss_cls: 0.2333, loss_bbox: 0.0959, loss_kps: 14.0585, loss: 14.3877
+2022-07-11 04:53:09,246 - mmdet - INFO - Epoch [2][200/241]	lr: 6.250e-04, eta: 3:58:35, time: 1.003, data_time: 0.127, memory: 7994, loss_cls: 0.2422, loss_bbox: 0.0927, loss_kps: 13.4978, loss: 13.8327
+2022-07-11 04:54:49,243 - mmdet - INFO - Epoch [3][50/241]	lr: 6.250e-04, eta: 3:43:57, time: 1.173, data_time: 0.273, memory: 7994, loss_cls: 0.2256, loss_bbox: 0.0909, loss_kps: 12.4454, loss: 12.7619
+2022-07-11 04:55:40,008 - mmdet - INFO - Epoch [3][100/241]	lr: 6.250e-04, eta: 3:45:36, time: 1.015, data_time: 0.135, memory: 7994, loss_cls: 0.2184, loss_bbox: 0.0879, loss_kps: 12.2564, loss: 12.5627
+2022-07-11 04:56:30,368 - mmdet - INFO - Epoch [3][150/241]	lr: 6.250e-04, eta: 3:46:41, time: 1.007, data_time: 0.130, memory: 7994, loss_cls: 0.2199, loss_bbox: 0.0875, loss_kps: 11.7122, loss: 12.0197
+2022-07-11 04:57:20,474 - mmdet - INFO - Epoch [3][200/241]	lr: 6.250e-04, eta: 3:47:25, time: 1.002, data_time: 0.123, memory: 7994, loss_cls: 0.2195, loss_bbox: 0.0858, loss_kps: 11.9025, loss: 12.2078
+2022-07-11 04:59:02,428 - mmdet - INFO - Epoch [4][50/241]	lr: 6.250e-04, eta: 3:38:43, time: 1.223, data_time: 0.290, memory: 7994, loss_cls: 0.2139, loss_bbox: 0.0837, loss_kps: 10.8269, loss: 11.1245
+2022-07-11 05:00:25,517 - mmdet - INFO - Epoch [4][100/241]	lr: 6.250e-04, eta: 3:49:18, time: 1.662, data_time: 0.222, memory: 7994, loss_cls: 0.2181, loss_bbox: 0.0847, loss_kps: 11.2566, loss: 11.5593
+2022-07-11 05:01:56,308 - mmdet - INFO - Epoch [4][150/241]	lr: 6.250e-04, eta: 4:00:35, time: 1.811, data_time: 0.223, memory: 7994, loss_cls: 0.2108, loss_bbox: 0.0824, loss_kps: 10.9804, loss: 11.2736
+2022-07-11 05:03:21,537 - mmdet - INFO - Epoch [4][200/241]	lr: 6.250e-04, eta: 4:09:09, time: 1.710, data_time: 0.232, memory: 7994, loss_cls: 0.2178, loss_bbox: 0.0826, loss_kps: 10.7410, loss: 11.0414
+2022-07-11 05:05:45,929 - mmdet - INFO - Epoch [5][50/241]	lr: 6.250e-04, eta: 4:04:02, time: 1.576, data_time: 0.466, memory: 7994, loss_cls: 0.2106, loss_bbox: 0.0813, loss_kps: 11.1074, loss: 11.3993
+2022-07-11 05:07:17,919 - mmdet - INFO - Epoch [5][100/241]	lr: 6.250e-04, eta: 4:12:27, time: 1.840, data_time: 0.183, memory: 7994, loss_cls: 0.2089, loss_bbox: 0.0803, loss_kps: 9.8396, loss: 10.1289
+2022-07-11 05:08:44,515 - mmdet - INFO - Epoch [5][150/241]	lr: 6.250e-04, eta: 4:18:49, time: 1.732, data_time: 0.179, memory: 7994, loss_cls: 0.2085, loss_bbox: 0.0816, loss_kps: 10.2409, loss: 10.5310
+2022-07-11 05:10:13,520 - mmdet - INFO - Epoch [5][200/241]	lr: 6.250e-04, eta: 4:25:00, time: 1.780, data_time: 0.204, memory: 7994, loss_cls: 0.2128, loss_bbox: 0.0803, loss_kps: 9.7045, loss: 9.9976
+2022-07-11 05:11:17,574 - mmdet - INFO - Saving checkpoint at 5 epochs
+2022-07-11 05:11:21,239 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 179 | 2569 | 0.939  | 0.926 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.926 |
++-------+-----+------+--------+-------+
+2022-07-11 05:11:21,360 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_poisson.py
+2022-07-11 05:11:21,360 - mmdet - INFO - Epoch(val) [5][241]	mAP: 0.9257
+2022-07-11 05:12:46,719 - mmdet - INFO - Epoch [6][50/241]	lr: 6.250e-04, eta: 4:20:16, time: 1.706, data_time: 0.392, memory: 7994, loss_cls: 0.2068, loss_bbox: 0.0795, loss_kps: 9.2460, loss: 9.5323
+2022-07-11 05:14:16,111 - mmdet - INFO - Epoch [6][100/241]	lr: 6.250e-04, eta: 4:25:32, time: 1.788, data_time: 0.195, memory: 7994, loss_cls: 0.2095, loss_bbox: 0.0798, loss_kps: 9.9852, loss: 10.2745
+2022-07-11 05:15:44,114 - mmdet - INFO - Epoch [6][150/241]	lr: 6.250e-04, eta: 4:30:04, time: 1.760, data_time: 0.198, memory: 7994, loss_cls: 0.2037, loss_bbox: 0.0782, loss_kps: 8.9179, loss: 9.1998
+2022-07-11 05:17:13,721 - mmdet - INFO - Epoch [6][200/241]	lr: 6.250e-04, eta: 4:34:26, time: 1.792, data_time: 0.183, memory: 7994, loss_cls: 0.2102, loss_bbox: 0.0796, loss_kps: 9.8743, loss: 10.1641
+2022-07-11 05:19:49,514 - mmdet - INFO - Epoch [7][50/241]	lr: 6.250e-04, eta: 4:32:14, time: 2.085, data_time: 0.430, memory: 7994, loss_cls: 0.2004, loss_bbox: 0.0759, loss_kps: 8.9281, loss: 9.2044
+2022-07-11 05:21:20,920 - mmdet - INFO - Epoch [7][100/241]	lr: 6.250e-04, eta: 4:36:10, time: 1.828, data_time: 0.204, memory: 7994, loss_cls: 0.2030, loss_bbox: 0.0784, loss_kps: 9.0969, loss: 9.3783
+2022-07-11 05:22:48,316 - mmdet - INFO - Epoch [7][150/241]	lr: 6.250e-04, eta: 4:39:10, time: 1.748, data_time: 0.230, memory: 7994, loss_cls: 0.2035, loss_bbox: 0.0789, loss_kps: 9.4436, loss: 9.7259
+2022-07-11 05:24:08,292 - mmdet - INFO - Epoch [7][200/241]	lr: 6.250e-04, eta: 4:40:52, time: 1.599, data_time: 0.210, memory: 7994, loss_cls: 0.2009, loss_bbox: 0.0778, loss_kps: 9.7935, loss: 10.0723
+2022-07-11 05:26:44,518 - mmdet - INFO - Epoch [8][50/241]	lr: 6.250e-04, eta: 4:38:27, time: 2.140, data_time: 0.533, memory: 7994, loss_cls: 0.2028, loss_bbox: 0.0767, loss_kps: 8.7128, loss: 8.9924
+2022-07-11 05:28:13,718 - mmdet - INFO - Epoch [8][100/241]	lr: 6.250e-04, eta: 4:41:01, time: 1.784, data_time: 0.230, memory: 7994, loss_cls: 0.2089, loss_bbox: 0.0776, loss_kps: 9.4084, loss: 9.6948
+2022-07-11 05:29:41,919 - mmdet - INFO - Epoch [8][150/241]	lr: 6.250e-04, eta: 4:43:14, time: 1.764, data_time: 0.175, memory: 7994, loss_cls: 0.2007, loss_bbox: 0.0768, loss_kps: 9.1906, loss: 9.4681
+2022-07-11 05:30:48,529 - mmdet - INFO - Epoch [8][200/241]	lr: 6.250e-04, eta: 4:42:41, time: 1.332, data_time: 0.171, memory: 7994, loss_cls: 0.1998, loss_bbox: 0.0777, loss_kps: 8.9524, loss: 9.2299
+2022-07-11 05:33:38,920 - mmdet - INFO - Epoch [9][50/241]	lr: 6.250e-04, eta: 4:40:42, time: 2.267, data_time: 0.525, memory: 7994, loss_cls: 0.2068, loss_bbox: 0.0775, loss_kps: 8.9992, loss: 9.2835
+2022-07-11 05:35:07,111 - mmdet - INFO - Epoch [9][100/241]	lr: 6.250e-04, eta: 4:42:27, time: 1.760, data_time: 0.185, memory: 7994, loss_cls: 0.1972, loss_bbox: 0.0764, loss_kps: 8.7939, loss: 9.0675
+2022-07-11 05:36:36,610 - mmdet - INFO - Epoch [9][150/241]	lr: 6.250e-04, eta: 4:44:13, time: 1.794, data_time: 0.184, memory: 7994, loss_cls: 0.1956, loss_bbox: 0.0757, loss_kps: 8.3578, loss: 8.6291
+2022-07-11 05:37:37,318 - mmdet - INFO - Epoch [9][200/241]	lr: 6.250e-04, eta: 4:42:50, time: 1.214, data_time: 0.156, memory: 7994, loss_cls: 0.1992, loss_bbox: 0.0747, loss_kps: 8.8051, loss: 9.0790
+2022-07-11 05:40:37,517 - mmdet - INFO - Epoch [10][50/241]	lr: 6.250e-04, eta: 4:40:33, time: 2.253, data_time: 0.578, memory: 7994, loss_cls: 0.1997, loss_bbox: 0.0751, loss_kps: 8.2100, loss: 8.4849
+2022-07-11 05:42:07,060 - mmdet - INFO - Epoch [10][100/241]	lr: 6.250e-04, eta: 4:41:59, time: 1.791, data_time: 0.204, memory: 7994, loss_cls: 0.2010, loss_bbox: 0.0748, loss_kps: 9.0478, loss: 9.3236
+2022-07-11 05:43:18,099 - mmdet - INFO - Epoch [10][150/241]	lr: 6.250e-04, eta: 4:41:32, time: 1.421, data_time: 0.182, memory: 7994, loss_cls: 0.1979, loss_bbox: 0.0738, loss_kps: 8.6337, loss: 8.9054
+2022-07-11 05:44:39,989 - mmdet - INFO - Epoch [10][200/241]	lr: 6.250e-04, eta: 4:42:04, time: 1.638, data_time: 0.187, memory: 7994, loss_cls: 0.1970, loss_bbox: 0.0753, loss_kps: 8.2009, loss: 8.4732
+2022-07-11 05:45:43,913 - mmdet - INFO - Saving checkpoint at 10 epochs
+2022-07-11 05:45:50,450 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 179 | 2339 | 0.944  | 0.925 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.925 |
++-------+-----+------+--------+-------+
+2022-07-11 05:45:50,572 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_poisson.py
+2022-07-11 05:45:50,573 - mmdet - INFO - Epoch(val) [10][241]	mAP: 0.9252
+2022-07-11 05:47:37,072 - mmdet - INFO - Epoch [11][50/241]	lr: 6.250e-04, eta: 4:39:05, time: 2.129, data_time: 0.508, memory: 7994, loss_cls: 0.1962, loss_bbox: 0.0746, loss_kps: 8.0358, loss: 8.3065
+2022-07-11 05:49:04,512 - mmdet - INFO - Epoch [11][100/241]	lr: 6.250e-04, eta: 4:39:58, time: 1.749, data_time: 0.195, memory: 7994, loss_cls: 0.1989, loss_bbox: 0.0742, loss_kps: 8.7753, loss: 9.0484
+2022-07-11 05:50:06,111 - mmdet - INFO - Epoch [11][150/241]	lr: 6.250e-04, eta: 4:38:36, time: 1.232, data_time: 0.159, memory: 7994, loss_cls: 0.1993, loss_bbox: 0.0747, loss_kps: 8.0193, loss: 8.2932
+2022-07-11 05:51:35,316 - mmdet - INFO - Epoch [11][200/241]	lr: 6.250e-04, eta: 4:39:30, time: 1.784, data_time: 0.182, memory: 7994, loss_cls: 0.1938, loss_bbox: 0.0748, loss_kps: 8.3778, loss: 8.6464
+2022-07-11 05:54:29,314 - mmdet - INFO - Epoch [12][50/241]	lr: 6.250e-04, eta: 4:36:38, time: 2.159, data_time: 0.538, memory: 7994, loss_cls: 0.1903, loss_bbox: 0.0738, loss_kps: 8.1708, loss: 8.4349
+2022-07-11 05:55:41,857 - mmdet - INFO - Epoch [12][100/241]	lr: 6.250e-04, eta: 4:36:07, time: 1.451, data_time: 0.170, memory: 7994, loss_cls: 0.1968, loss_bbox: 0.0765, loss_kps: 8.6836, loss: 8.9569
+2022-07-11 05:57:02,712 - mmdet - INFO - Epoch [12][150/241]	lr: 6.250e-04, eta: 4:36:11, time: 1.617, data_time: 0.169, memory: 7994, loss_cls: 0.1990, loss_bbox: 0.0719, loss_kps: 7.6000, loss: 7.8709
+2022-07-11 05:58:30,964 - mmdet - INFO - Epoch [12][200/241]	lr: 6.250e-04, eta: 4:36:45, time: 1.765, data_time: 0.171, memory: 7994, loss_cls: 0.1958, loss_bbox: 0.0739, loss_kps: 8.0863, loss: 8.3559
+2022-07-11 06:01:26,230 - mmdet - INFO - Epoch [13][50/241]	lr: 6.250e-04, eta: 4:34:00, time: 2.189, data_time: 0.574, memory: 7994, loss_cls: 0.1951, loss_bbox: 0.0736, loss_kps: 7.9191, loss: 8.1877
+2022-07-11 06:02:23,394 - mmdet - INFO - Epoch [13][100/241]	lr: 6.250e-04, eta: 4:32:18, time: 1.143, data_time: 0.155, memory: 7994, loss_cls: 0.1966, loss_bbox: 0.0718, loss_kps: 7.3983, loss: 7.6668
+2022-07-11 06:03:49,918 - mmdet - INFO - Epoch [13][150/241]	lr: 6.250e-04, eta: 4:32:37, time: 1.730, data_time: 0.209, memory: 7994, loss_cls: 0.1955, loss_bbox: 0.0736, loss_kps: 7.6364, loss: 7.9055
+2022-07-11 06:05:20,516 - mmdet - INFO - Epoch [13][200/241]	lr: 6.250e-04, eta: 4:33:08, time: 1.812, data_time: 0.248, memory: 7994, loss_cls: 0.1965, loss_bbox: 0.0732, loss_kps: 7.7206, loss: 7.9903
+2022-07-11 06:08:08,833 - mmdet - INFO - Epoch [14][50/241]	lr: 6.250e-04, eta: 4:30:08, time: 2.109, data_time: 0.584, memory: 7994, loss_cls: 0.1941, loss_bbox: 0.0723, loss_kps: 7.8408, loss: 8.1073
+2022-07-11 06:09:15,138 - mmdet - INFO - Epoch [14][100/241]	lr: 6.250e-04, eta: 4:29:02, time: 1.326, data_time: 0.155, memory: 7994, loss_cls: 0.1872, loss_bbox: 0.0710, loss_kps: 7.5548, loss: 7.8129
+2022-07-11 06:10:46,598 - mmdet - INFO - Epoch [14][150/241]	lr: 6.250e-04, eta: 4:29:29, time: 1.829, data_time: 0.210, memory: 7994, loss_cls: 0.1962, loss_bbox: 0.0716, loss_kps: 7.3340, loss: 7.6019
+2022-07-11 06:12:15,511 - mmdet - INFO - Epoch [14][200/241]	lr: 6.250e-04, eta: 4:29:44, time: 1.778, data_time: 0.191, memory: 7994, loss_cls: 0.1961, loss_bbox: 0.0727, loss_kps: 7.9177, loss: 8.1864
+2022-07-11 06:14:46,041 - mmdet - INFO - Epoch [15][50/241]	lr: 6.250e-04, eta: 4:25:31, time: 1.691, data_time: 0.529, memory: 7994, loss_cls: 0.1980, loss_bbox: 0.0714, loss_kps: 7.7433, loss: 8.0128
+2022-07-11 06:16:11,946 - mmdet - INFO - Epoch [15][100/241]	lr: 6.250e-04, eta: 4:25:32, time: 1.718, data_time: 0.179, memory: 7994, loss_cls: 0.2002, loss_bbox: 0.0720, loss_kps: 7.9357, loss: 8.2079
+2022-07-11 06:17:41,316 - mmdet - INFO - Epoch [15][150/241]	lr: 6.250e-04, eta: 4:25:42, time: 1.787, data_time: 0.178, memory: 7994, loss_cls: 0.1898, loss_bbox: 0.0710, loss_kps: 7.5384, loss: 7.7992
+2022-07-11 06:19:08,715 - mmdet - INFO - Epoch [15][200/241]	lr: 6.250e-04, eta: 4:25:43, time: 1.748, data_time: 0.173, memory: 7994, loss_cls: 0.1904, loss_bbox: 0.0715, loss_kps: 7.5556, loss: 7.8175
+2022-07-11 06:20:13,309 - mmdet - INFO - Saving checkpoint at 15 epochs
+2022-07-11 06:20:19,079 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 179 | 3565 | 0.916  | 0.901 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.901 |
++-------+-----+------+--------+-------+
+2022-07-11 06:20:19,203 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_poisson.py
+2022-07-11 06:20:19,203 - mmdet - INFO - Epoch(val) [15][241]	mAP: 0.9014
+2022-07-11 06:21:39,115 - mmdet - INFO - Epoch [16][50/241]	lr: 6.250e-04, eta: 4:21:24, time: 1.597, data_time: 0.396, memory: 7994, loss_cls: 0.1943, loss_bbox: 0.0718, loss_kps: 7.4760, loss: 7.7421
+2022-07-11 06:23:07,517 - mmdet - INFO - Epoch [16][100/241]	lr: 6.250e-04, eta: 4:21:25, time: 1.768, data_time: 0.179, memory: 7994, loss_cls: 0.1940, loss_bbox: 0.0721, loss_kps: 7.1421, loss: 7.4082
+2022-07-11 06:24:36,715 - mmdet - INFO - Epoch [16][150/241]	lr: 6.250e-04, eta: 4:21:27, time: 1.784, data_time: 0.191, memory: 7994, loss_cls: 0.1968, loss_bbox: 0.0716, loss_kps: 7.5072, loss: 7.7756
+2022-07-11 06:26:04,319 - mmdet - INFO - Epoch [16][200/241]	lr: 6.250e-04, eta: 4:21:22, time: 1.752, data_time: 0.168, memory: 7994, loss_cls: 0.1922, loss_bbox: 0.0716, loss_kps: 7.5985, loss: 7.8623
+2022-07-11 06:28:33,714 - mmdet - INFO - Epoch [17][50/241]	lr: 6.250e-04, eta: 4:17:43, time: 1.807, data_time: 0.356, memory: 7994, loss_cls: 0.1951, loss_bbox: 0.0720, loss_kps: 7.3209, loss: 7.5880
+2022-07-11 06:30:05,311 - mmdet - INFO - Epoch [17][100/241]	lr: 6.250e-04, eta: 4:17:47, time: 1.832, data_time: 0.173, memory: 7994, loss_cls: 0.1947, loss_bbox: 0.0712, loss_kps: 7.3405, loss: 7.6064
+2022-07-11 06:31:32,721 - mmdet - INFO - Epoch [17][150/241]	lr: 6.250e-04, eta: 4:17:36, time: 1.748, data_time: 0.159, memory: 7994, loss_cls: 0.1892, loss_bbox: 0.0709, loss_kps: 7.1201, loss: 7.3802
+2022-07-11 06:32:59,315 - mmdet - INFO - Epoch [17][200/241]	lr: 6.250e-04, eta: 4:17:21, time: 1.732, data_time: 0.145, memory: 7994, loss_cls: 0.1916, loss_bbox: 0.0706, loss_kps: 7.5506, loss: 7.8127
+2022-07-11 06:35:26,109 - mmdet - INFO - Epoch [18][50/241]	lr: 6.250e-04, eta: 4:14:04, time: 1.932, data_time: 0.372, memory: 7994, loss_cls: 0.1900, loss_bbox: 0.0702, loss_kps: 7.1447, loss: 7.4049
+2022-07-11 06:36:54,166 - mmdet - INFO - Epoch [18][100/241]	lr: 6.250e-04, eta: 4:13:51, time: 1.761, data_time: 0.217, memory: 7994, loss_cls: 0.1901, loss_bbox: 0.0707, loss_kps: 7.4263, loss: 7.6871
+2022-07-11 06:38:22,509 - mmdet - INFO - Epoch [18][150/241]	lr: 6.250e-04, eta: 4:13:38, time: 1.767, data_time: 0.214, memory: 7994, loss_cls: 0.1899, loss_bbox: 0.0705, loss_kps: 7.4261, loss: 7.6865
+2022-07-11 06:39:50,514 - mmdet - INFO - Epoch [18][200/241]	lr: 6.250e-04, eta: 4:13:21, time: 1.760, data_time: 0.171, memory: 7994, loss_cls: 0.1900, loss_bbox: 0.0718, loss_kps: 7.2287, loss: 7.4905
+2022-07-11 06:42:22,703 - mmdet - INFO - Epoch [19][50/241]	lr: 6.250e-04, eta: 4:10:39, time: 2.190, data_time: 0.578, memory: 7994, loss_cls: 0.1901, loss_bbox: 0.0706, loss_kps: 7.2330, loss: 7.4936
+2022-07-11 06:43:51,317 - mmdet - INFO - Epoch [19][100/241]	lr: 6.250e-04, eta: 4:10:22, time: 1.772, data_time: 0.196, memory: 7994, loss_cls: 0.1893, loss_bbox: 0.0690, loss_kps: 7.1838, loss: 7.4421
+2022-07-11 06:45:20,344 - mmdet - INFO - Epoch [19][150/241]	lr: 6.250e-04, eta: 4:10:04, time: 1.781, data_time: 0.176, memory: 7994, loss_cls: 0.1882, loss_bbox: 0.0704, loss_kps: 6.7581, loss: 7.0166
+2022-07-11 06:46:33,948 - mmdet - INFO - Epoch [19][200/241]	lr: 6.250e-04, eta: 4:09:07, time: 1.472, data_time: 0.189, memory: 7994, loss_cls: 0.1881, loss_bbox: 0.0696, loss_kps: 6.8664, loss: 7.1242
+2022-07-11 06:49:18,720 - mmdet - INFO - Epoch [20][50/241]	lr: 6.250e-04, eta: 4:06:22, time: 2.152, data_time: 0.618, memory: 7994, loss_cls: 0.1874, loss_bbox: 0.0707, loss_kps: 7.0278, loss: 7.2859
+2022-07-11 06:50:46,919 - mmdet - INFO - Epoch [20][100/241]	lr: 6.250e-04, eta: 4:05:59, time: 1.764, data_time: 0.188, memory: 7994, loss_cls: 0.1875, loss_bbox: 0.0707, loss_kps: 7.1835, loss: 7.4416
+2022-07-11 06:52:15,133 - mmdet - INFO - Epoch [20][150/241]	lr: 6.250e-04, eta: 4:05:34, time: 1.764, data_time: 0.181, memory: 7994, loss_cls: 0.1924, loss_bbox: 0.0696, loss_kps: 7.0682, loss: 7.3302
+2022-07-11 06:53:17,113 - mmdet - INFO - Epoch [20][200/241]	lr: 6.250e-04, eta: 4:04:10, time: 1.240, data_time: 0.146, memory: 7994, loss_cls: 0.1903, loss_bbox: 0.0705, loss_kps: 7.0585, loss: 7.3193
+2022-07-11 06:54:23,712 - mmdet - INFO - Saving checkpoint at 20 epochs
+2022-07-11 06:54:29,871 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 179 | 2427 | 0.939  | 0.927 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.927 |
++-------+-----+------+--------+-------+
+2022-07-11 06:54:30,000 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_poisson.py
+2022-07-11 06:54:30,000 - mmdet - INFO - Epoch(val) [20][241]	mAP: 0.9270
+2022-07-11 06:56:18,317 - mmdet - INFO - Epoch [21][50/241]	lr: 6.250e-04, eta: 4:01:28, time: 2.165, data_time: 0.554, memory: 7994, loss_cls: 0.1855, loss_bbox: 0.0684, loss_kps: 6.9422, loss: 7.1960
+2022-07-11 06:57:46,317 - mmdet - INFO - Epoch [21][100/241]	lr: 6.250e-04, eta: 4:01:01, time: 1.760, data_time: 0.183, memory: 7994, loss_cls: 0.1886, loss_bbox: 0.0691, loss_kps: 6.6741, loss: 6.9318
+2022-07-11 06:59:03,897 - mmdet - INFO - Epoch [21][150/241]	lr: 6.250e-04, eta: 4:00:10, time: 1.552, data_time: 0.172, memory: 7994, loss_cls: 0.1866, loss_bbox: 0.0688, loss_kps: 6.5950, loss: 6.8504
+2022-07-11 07:00:24,119 - mmdet - INFO - Epoch [21][200/241]	lr: 6.250e-04, eta: 3:59:25, time: 1.604, data_time: 0.192, memory: 7994, loss_cls: 0.1885, loss_bbox: 0.0700, loss_kps: 6.6209, loss: 6.8794
+2022-07-11 07:03:23,521 - mmdet - INFO - Epoch [22][50/241]	lr: 6.250e-04, eta: 3:56:54, time: 2.267, data_time: 0.572, memory: 7994, loss_cls: 0.1883, loss_bbox: 0.0689, loss_kps: 6.6423, loss: 6.8996
+2022-07-11 07:04:57,626 - mmdet - INFO - Epoch [22][100/241]	lr: 6.250e-04, eta: 3:56:35, time: 1.882, data_time: 0.221, memory: 7994, loss_cls: 0.1875, loss_bbox: 0.0686, loss_kps: 7.0476, loss: 7.3037
+2022-07-11 07:05:56,244 - mmdet - INFO - Epoch [22][150/241]	lr: 6.250e-04, eta: 3:55:06, time: 1.172, data_time: 0.150, memory: 7994, loss_cls: 0.1847, loss_bbox: 0.0697, loss_kps: 7.0271, loss: 7.2815
+2022-07-11 07:07:25,721 - mmdet - INFO - Epoch [22][200/241]	lr: 6.250e-04, eta: 3:54:36, time: 1.790, data_time: 0.216, memory: 7994, loss_cls: 0.1922, loss_bbox: 0.0693, loss_kps: 7.5788, loss: 7.8402
+2022-07-11 07:10:22,905 - mmdet - INFO - Epoch [23][50/241]	lr: 6.250e-04, eta: 3:52:02, time: 2.222, data_time: 0.543, memory: 7994, loss_cls: 0.1859, loss_bbox: 0.0704, loss_kps: 6.8830, loss: 7.1394
+2022-07-11 07:11:49,922 - mmdet - INFO - Epoch [23][100/241]	lr: 6.250e-04, eta: 3:51:26, time: 1.740, data_time: 0.206, memory: 7994, loss_cls: 0.1909, loss_bbox: 0.0698, loss_kps: 7.1220, loss: 7.3827
+2022-07-11 07:12:51,934 - mmdet - INFO - Epoch [23][150/241]	lr: 6.250e-04, eta: 3:50:03, time: 1.240, data_time: 0.155, memory: 7994, loss_cls: 0.1868, loss_bbox: 0.0692, loss_kps: 7.2004, loss: 7.4564
+2022-07-11 07:14:20,720 - mmdet - INFO - Epoch [23][200/241]	lr: 6.250e-04, eta: 3:49:29, time: 1.776, data_time: 0.171, memory: 7994, loss_cls: 0.1929, loss_bbox: 0.0697, loss_kps: 7.3488, loss: 7.6114
+2022-07-11 07:17:20,920 - mmdet - INFO - Epoch [24][50/241]	lr: 6.250e-04, eta: 3:46:53, time: 2.187, data_time: 0.585, memory: 7994, loss_cls: 0.1896, loss_bbox: 0.0691, loss_kps: 6.8821, loss: 7.1408
+2022-07-11 07:18:31,517 - mmdet - INFO - Epoch [24][100/241]	lr: 6.250e-04, eta: 3:45:46, time: 1.412, data_time: 0.178, memory: 7994, loss_cls: 0.1853, loss_bbox: 0.0680, loss_kps: 7.0029, loss: 7.2561
+2022-07-11 07:19:54,512 - mmdet - INFO - Epoch [24][150/241]	lr: 6.250e-04, eta: 3:45:01, time: 1.660, data_time: 0.219, memory: 7994, loss_cls: 0.1858, loss_bbox: 0.0681, loss_kps: 6.4088, loss: 6.6626
+2022-07-11 07:21:22,513 - mmdet - INFO - Epoch [24][200/241]	lr: 6.250e-04, eta: 3:44:23, time: 1.760, data_time: 0.194, memory: 7994, loss_cls: 0.1826, loss_bbox: 0.0676, loss_kps: 7.0835, loss: 7.3336
+2022-07-11 07:24:16,309 - mmdet - INFO - Epoch [25][50/241]	lr: 6.250e-04, eta: 3:41:47, time: 2.175, data_time: 0.523, memory: 7994, loss_cls: 0.1840, loss_bbox: 0.0692, loss_kps: 6.6704, loss: 6.9237
+2022-07-11 07:25:17,714 - mmdet - INFO - Epoch [25][100/241]	lr: 6.250e-04, eta: 3:40:25, time: 1.228, data_time: 0.162, memory: 7994, loss_cls: 0.1866, loss_bbox: 0.0687, loss_kps: 6.9713, loss: 7.2266
+2022-07-11 07:26:48,137 - mmdet - INFO - Epoch [25][150/241]	lr: 6.250e-04, eta: 3:39:49, time: 1.808, data_time: 0.179, memory: 7994, loss_cls: 0.1905, loss_bbox: 0.0691, loss_kps: 6.3265, loss: 6.5861
+2022-07-11 07:28:18,313 - mmdet - INFO - Epoch [25][200/241]	lr: 6.250e-04, eta: 3:39:12, time: 1.803, data_time: 0.205, memory: 7994, loss_cls: 0.1885, loss_bbox: 0.0688, loss_kps: 6.7841, loss: 7.0413
+2022-07-11 07:29:24,380 - mmdet - INFO - Saving checkpoint at 25 epochs
+2022-07-11 07:29:30,706 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 179 | 2373 | 0.944  | 0.924 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.924 |
++-------+-----+------+--------+-------+
+2022-07-11 07:29:30,815 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_poisson.py
+2022-07-11 07:29:30,816 - mmdet - INFO - Epoch(val) [25][241]	mAP: 0.9241
+2022-07-11 07:30:56,858 - mmdet - INFO - Epoch [26][50/241]	lr: 6.250e-04, eta: 3:36:03, time: 1.720, data_time: 0.511, memory: 7994, loss_cls: 0.1919, loss_bbox: 0.0684, loss_kps: 6.3970, loss: 6.6574
+2022-07-11 07:32:20,306 - mmdet - INFO - Epoch [26][100/241]	lr: 6.250e-04, eta: 3:35:15, time: 1.669, data_time: 0.179, memory: 7994, loss_cls: 0.1849, loss_bbox: 0.0681, loss_kps: 6.5109, loss: 6.7640
+2022-07-11 07:33:49,111 - mmdet - INFO - Epoch [26][150/241]	lr: 6.250e-04, eta: 3:34:34, time: 1.776, data_time: 0.221, memory: 7994, loss_cls: 0.1827, loss_bbox: 0.0693, loss_kps: 6.5419, loss: 6.7938
+2022-07-11 07:35:15,110 - mmdet - INFO - Epoch [26][200/241]	lr: 6.250e-04, eta: 3:33:49, time: 1.720, data_time: 0.177, memory: 7994, loss_cls: 0.1844, loss_bbox: 0.0699, loss_kps: 6.3676, loss: 6.6219
+2022-07-11 07:37:34,713 - mmdet - INFO - Epoch [27][50/241]	lr: 6.250e-04, eta: 3:30:26, time: 1.489, data_time: 0.470, memory: 7994, loss_cls: 0.1873, loss_bbox: 0.0684, loss_kps: 6.4541, loss: 6.7098
+2022-07-11 07:39:01,313 - mmdet - INFO - Epoch [27][100/241]	lr: 6.250e-04, eta: 3:29:42, time: 1.732, data_time: 0.192, memory: 7994, loss_cls: 0.1871, loss_bbox: 0.0675, loss_kps: 6.4017, loss: 6.6563
+2022-07-11 07:40:29,310 - mmdet - INFO - Epoch [27][150/241]	lr: 6.250e-04, eta: 3:28:58, time: 1.760, data_time: 0.190, memory: 7994, loss_cls: 0.1888, loss_bbox: 0.0685, loss_kps: 6.7063, loss: 6.9636
+2022-07-11 07:41:56,104 - mmdet - INFO - Epoch [27][200/241]	lr: 6.250e-04, eta: 3:28:12, time: 1.736, data_time: 0.193, memory: 7994, loss_cls: 0.1849, loss_bbox: 0.0679, loss_kps: 6.6462, loss: 6.8990
+2022-07-11 07:44:23,502 - mmdet - INFO - Epoch [28][50/241]	lr: 6.250e-04, eta: 3:25:04, time: 1.630, data_time: 0.429, memory: 7994, loss_cls: 0.1862, loss_bbox: 0.0678, loss_kps: 6.4964, loss: 6.7504
+2022-07-11 07:45:53,109 - mmdet - INFO - Epoch [28][100/241]	lr: 6.250e-04, eta: 3:24:22, time: 1.792, data_time: 0.199, memory: 7994, loss_cls: 0.1895, loss_bbox: 0.0697, loss_kps: 6.7976, loss: 7.0568
+2022-07-11 07:47:21,310 - mmdet - INFO - Epoch [28][150/241]	lr: 6.250e-04, eta: 3:23:37, time: 1.764, data_time: 0.209, memory: 7994, loss_cls: 0.1850, loss_bbox: 0.0691, loss_kps: 6.4869, loss: 6.7410
+2022-07-11 07:48:52,277 - mmdet - INFO - Epoch [28][200/241]	lr: 6.250e-04, eta: 3:22:55, time: 1.819, data_time: 0.202, memory: 7994, loss_cls: 0.1850, loss_bbox: 0.0678, loss_kps: 6.8034, loss: 7.0563
+2022-07-11 07:51:24,905 - mmdet - INFO - Epoch [29][50/241]	lr: 6.250e-04, eta: 3:20:06, time: 1.887, data_time: 0.371, memory: 7994, loss_cls: 0.1832, loss_bbox: 0.0695, loss_kps: 6.7290, loss: 6.9817
+2022-07-11 07:52:52,110 - mmdet - INFO - Epoch [29][100/241]	lr: 6.250e-04, eta: 3:19:18, time: 1.744, data_time: 0.176, memory: 7994, loss_cls: 0.1874, loss_bbox: 0.0679, loss_kps: 6.2797, loss: 6.5350
+2022-07-11 07:54:17,902 - mmdet - INFO - Epoch [29][150/241]	lr: 6.250e-04, eta: 3:18:29, time: 1.716, data_time: 0.169, memory: 7994, loss_cls: 0.1859, loss_bbox: 0.0689, loss_kps: 6.5894, loss: 6.8442
+2022-07-11 07:55:46,717 - mmdet - INFO - Epoch [29][200/241]	lr: 6.250e-04, eta: 3:17:42, time: 1.776, data_time: 0.197, memory: 7994, loss_cls: 0.1878, loss_bbox: 0.0690, loss_kps: 6.7461, loss: 7.0028
+2022-07-11 07:58:21,412 - mmdet - INFO - Epoch [30][50/241]	lr: 6.250e-04, eta: 3:15:15, time: 2.215, data_time: 0.561, memory: 7994, loss_cls: 0.1857, loss_bbox: 0.0666, loss_kps: 6.2497, loss: 6.5020
+2022-07-11 07:59:48,310 - mmdet - INFO - Epoch [30][100/241]	lr: 6.250e-04, eta: 3:14:25, time: 1.738, data_time: 0.178, memory: 7994, loss_cls: 0.1867, loss_bbox: 0.0679, loss_kps: 6.7844, loss: 7.0389
+2022-07-11 08:01:17,306 - mmdet - INFO - Epoch [30][150/241]	lr: 6.250e-04, eta: 3:13:37, time: 1.780, data_time: 0.167, memory: 7994, loss_cls: 0.1859, loss_bbox: 0.0671, loss_kps: 6.5160, loss: 6.7690
+2022-07-11 08:02:31,339 - mmdet - INFO - Epoch [30][200/241]	lr: 6.250e-04, eta: 3:12:31, time: 1.481, data_time: 0.168, memory: 7994, loss_cls: 0.1877, loss_bbox: 0.0701, loss_kps: 7.0087, loss: 7.2666
+2022-07-11 08:03:24,082 - mmdet - INFO - Saving checkpoint at 30 epochs
+2022-07-11 08:03:29,802 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 179 | 2668 | 0.933  | 0.912 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.912 |
++-------+-----+------+--------+-------+
+2022-07-11 08:03:29,915 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_poisson.py
+2022-07-11 08:03:29,916 - mmdet - INFO - Epoch(val) [30][241]	mAP: 0.9122
+2022-07-11 08:05:15,505 - mmdet - INFO - Epoch [31][50/241]	lr: 6.250e-04, eta: 3:09:59, time: 2.110, data_time: 0.536, memory: 7994, loss_cls: 0.1838, loss_bbox: 0.0687, loss_kps: 6.3590, loss: 6.6116
+2022-07-11 08:06:43,501 - mmdet - INFO - Epoch [31][100/241]	lr: 6.250e-04, eta: 3:09:09, time: 1.760, data_time: 0.170, memory: 7994, loss_cls: 0.1862, loss_bbox: 0.0671, loss_kps: 6.8068, loss: 7.0602
+2022-07-11 08:08:10,905 - mmdet - INFO - Epoch [31][150/241]	lr: 6.250e-04, eta: 3:08:18, time: 1.748, data_time: 0.191, memory: 7994, loss_cls: 0.1848, loss_bbox: 0.0677, loss_kps: 6.3238, loss: 6.5763
+2022-07-11 08:09:12,576 - mmdet - INFO - Epoch [31][200/241]	lr: 6.250e-04, eta: 3:06:58, time: 1.233, data_time: 0.161, memory: 7994, loss_cls: 0.1870, loss_bbox: 0.0683, loss_kps: 6.3207, loss: 6.5760
+2022-07-11 08:12:03,850 - mmdet - INFO - Epoch [32][50/241]	lr: 6.250e-04, eta: 3:04:32, time: 2.209, data_time: 0.577, memory: 7994, loss_cls: 0.1870, loss_bbox: 0.0672, loss_kps: 6.4842, loss: 6.7384
+2022-07-11 08:13:32,306 - mmdet - INFO - Epoch [32][100/241]	lr: 6.250e-04, eta: 3:03:41, time: 1.769, data_time: 0.184, memory: 7994, loss_cls: 0.1826, loss_bbox: 0.0663, loss_kps: 6.2262, loss: 6.4751
+2022-07-11 08:14:57,313 - mmdet - INFO - Epoch [32][150/241]	lr: 6.250e-04, eta: 3:02:46, time: 1.700, data_time: 0.154, memory: 7994, loss_cls: 0.1857, loss_bbox: 0.0680, loss_kps: 6.3368, loss: 6.5905
+2022-07-11 08:15:59,905 - mmdet - INFO - Epoch [32][200/241]	lr: 6.250e-04, eta: 3:01:28, time: 1.252, data_time: 0.172, memory: 7994, loss_cls: 0.1864, loss_bbox: 0.0668, loss_kps: 6.4985, loss: 6.7518
+2022-07-11 08:18:33,914 - mmdet - INFO - Epoch [33][50/241]	lr: 6.250e-05, eta: 2:58:42, time: 1.781, data_time: 0.502, memory: 7994, loss_cls: 0.1867, loss_bbox: 0.0651, loss_kps: 6.3773, loss: 6.6291
+2022-07-11 08:19:24,140 - mmdet - INFO - Epoch [33][100/241]	lr: 6.250e-05, eta: 2:57:13, time: 1.005, data_time: 0.133, memory: 7994, loss_cls: 0.1883, loss_bbox: 0.0653, loss_kps: 6.0149, loss: 6.2685
+2022-07-11 08:20:14,183 - mmdet - INFO - Epoch [33][150/241]	lr: 6.250e-05, eta: 2:55:44, time: 1.001, data_time: 0.124, memory: 7994, loss_cls: 0.1835, loss_bbox: 0.0655, loss_kps: 5.9111, loss: 6.1601
+2022-07-11 08:21:04,680 - mmdet - INFO - Epoch [33][200/241]	lr: 6.250e-05, eta: 2:54:16, time: 1.010, data_time: 0.129, memory: 7994, loss_cls: 0.1828, loss_bbox: 0.0642, loss_kps: 6.1224, loss: 6.3694
+2022-07-11 08:22:44,098 - mmdet - INFO - Epoch [34][50/241]	lr: 6.250e-05, eta: 2:51:06, time: 1.169, data_time: 0.265, memory: 7994, loss_cls: 0.1861, loss_bbox: 0.0643, loss_kps: 6.0409, loss: 6.2913
+2022-07-11 08:23:34,255 - mmdet - INFO - Epoch [34][100/241]	lr: 6.250e-05, eta: 2:49:40, time: 1.003, data_time: 0.131, memory: 7994, loss_cls: 0.1806, loss_bbox: 0.0643, loss_kps: 6.3001, loss: 6.5451
+2022-07-11 08:24:24,012 - mmdet - INFO - Epoch [34][150/241]	lr: 6.250e-05, eta: 2:48:13, time: 0.995, data_time: 0.125, memory: 7994, loss_cls: 0.1803, loss_bbox: 0.0635, loss_kps: 6.1563, loss: 6.4001
+2022-07-11 08:25:13,732 - mmdet - INFO - Epoch [34][200/241]	lr: 6.250e-05, eta: 2:46:47, time: 0.994, data_time: 0.123, memory: 7994, loss_cls: 0.1813, loss_bbox: 0.0640, loss_kps: 5.8054, loss: 6.0506
+2022-07-11 08:26:52,912 - mmdet - INFO - Epoch [35][50/241]	lr: 6.250e-05, eta: 2:43:44, time: 1.170, data_time: 0.265, memory: 7994, loss_cls: 0.1801, loss_bbox: 0.0630, loss_kps: 5.7742, loss: 6.0173
+2022-07-11 08:27:43,405 - mmdet - INFO - Epoch [35][100/241]	lr: 6.250e-05, eta: 2:42:20, time: 1.010, data_time: 0.132, memory: 7994, loss_cls: 0.1811, loss_bbox: 0.0640, loss_kps: 5.8234, loss: 6.0685
+2022-07-11 08:28:33,849 - mmdet - INFO - Epoch [35][150/241]	lr: 6.250e-05, eta: 2:40:56, time: 1.009, data_time: 0.130, memory: 7994, loss_cls: 0.1840, loss_bbox: 0.0636, loss_kps: 5.6239, loss: 5.8714
+2022-07-11 08:29:24,179 - mmdet - INFO - Epoch [35][200/241]	lr: 6.250e-05, eta: 2:39:33, time: 1.007, data_time: 0.128, memory: 7994, loss_cls: 0.1838, loss_bbox: 0.0637, loss_kps: 6.0520, loss: 6.2996
+2022-07-11 08:30:04,923 - mmdet - INFO - Saving checkpoint at 35 epochs
+2022-07-11 08:30:08,624 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 179 | 2181 | 0.939  | 0.911 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.911 |
++-------+-----+------+--------+-------+
+2022-07-11 08:30:08,743 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_poisson.py
+2022-07-11 08:30:08,744 - mmdet - INFO - Epoch(val) [35][241]	mAP: 0.9106
+2022-07-11 08:31:08,792 - mmdet - INFO - Epoch [36][50/241]	lr: 6.250e-05, eta: 2:36:37, time: 1.200, data_time: 0.277, memory: 7994, loss_cls: 0.1792, loss_bbox: 0.0624, loss_kps: 5.5378, loss: 5.7794
+2022-07-11 08:31:59,365 - mmdet - INFO - Epoch [36][100/241]	lr: 6.250e-05, eta: 2:35:15, time: 1.011, data_time: 0.137, memory: 7994, loss_cls: 0.1792, loss_bbox: 0.0629, loss_kps: 5.6711, loss: 5.9132
+2022-07-11 08:32:48,798 - mmdet - INFO - Epoch [36][150/241]	lr: 6.250e-05, eta: 2:33:53, time: 0.989, data_time: 0.123, memory: 7994, loss_cls: 0.1762, loss_bbox: 0.0617, loss_kps: 5.3612, loss: 5.5991
+2022-07-11 08:33:38,902 - mmdet - INFO - Epoch [36][200/241]	lr: 6.250e-05, eta: 2:32:32, time: 1.002, data_time: 0.129, memory: 7994, loss_cls: 0.1816, loss_bbox: 0.0637, loss_kps: 5.6333, loss: 5.8785
+2022-07-11 08:35:18,676 - mmdet - INFO - Epoch [37][50/241]	lr: 6.250e-05, eta: 2:29:41, time: 1.182, data_time: 0.273, memory: 7994, loss_cls: 0.1802, loss_bbox: 0.0625, loss_kps: 5.3713, loss: 5.6140
+2022-07-11 08:36:08,346 - mmdet - INFO - Epoch [37][100/241]	lr: 6.250e-05, eta: 2:28:20, time: 0.993, data_time: 0.123, memory: 7994, loss_cls: 0.1803, loss_bbox: 0.0618, loss_kps: 5.6390, loss: 5.8811
+2022-07-11 08:36:57,982 - mmdet - INFO - Epoch [37][150/241]	lr: 6.250e-05, eta: 2:27:01, time: 0.993, data_time: 0.121, memory: 7994, loss_cls: 0.1788, loss_bbox: 0.0635, loss_kps: 5.6045, loss: 5.8467
+2022-07-11 08:37:48,417 - mmdet - INFO - Epoch [37][200/241]	lr: 6.250e-05, eta: 2:25:42, time: 1.009, data_time: 0.126, memory: 7994, loss_cls: 0.1873, loss_bbox: 0.0631, loss_kps: 5.6184, loss: 5.8688
+2022-07-11 08:39:26,714 - mmdet - INFO - Epoch [38][50/241]	lr: 6.250e-05, eta: 2:22:54, time: 1.158, data_time: 0.261, memory: 7994, loss_cls: 0.1772, loss_bbox: 0.0624, loss_kps: 5.2302, loss: 5.4698
+2022-07-11 08:40:17,411 - mmdet - INFO - Epoch [38][100/241]	lr: 6.250e-05, eta: 2:21:37, time: 1.014, data_time: 0.133, memory: 7994, loss_cls: 0.1790, loss_bbox: 0.0618, loss_kps: 5.4416, loss: 5.6824
+2022-07-11 08:41:08,299 - mmdet - INFO - Epoch [38][150/241]	lr: 6.250e-05, eta: 2:20:20, time: 1.018, data_time: 0.134, memory: 7994, loss_cls: 0.1811, loss_bbox: 0.0625, loss_kps: 5.5621, loss: 5.8058
+2022-07-11 08:41:58,766 - mmdet - INFO - Epoch [38][200/241]	lr: 6.250e-05, eta: 2:19:03, time: 1.009, data_time: 0.129, memory: 7994, loss_cls: 0.1796, loss_bbox: 0.0624, loss_kps: 5.4318, loss: 5.6737
+2022-07-11 08:43:38,146 - mmdet - INFO - Epoch [39][50/241]	lr: 6.250e-05, eta: 2:16:21, time: 1.179, data_time: 0.267, memory: 7994, loss_cls: 0.1808, loss_bbox: 0.0618, loss_kps: 5.7179, loss: 5.9606
+2022-07-11 08:44:28,047 - mmdet - INFO - Epoch [39][100/241]	lr: 6.250e-05, eta: 2:15:04, time: 0.998, data_time: 0.129, memory: 7994, loss_cls: 0.1845, loss_bbox: 0.0634, loss_kps: 5.3966, loss: 5.6445
+2022-07-11 08:45:18,323 - mmdet - INFO - Epoch [39][150/241]	lr: 6.250e-05, eta: 2:13:48, time: 1.005, data_time: 0.133, memory: 7994, loss_cls: 0.1807, loss_bbox: 0.0617, loss_kps: 5.6512, loss: 5.8937
+2022-07-11 08:46:08,506 - mmdet - INFO - Epoch [39][200/241]	lr: 6.250e-05, eta: 2:12:33, time: 1.004, data_time: 0.130, memory: 7994, loss_cls: 0.1768, loss_bbox: 0.0626, loss_kps: 5.6289, loss: 5.8683
+2022-07-11 08:47:48,543 - mmdet - INFO - Epoch [40][50/241]	lr: 6.250e-05, eta: 2:09:56, time: 1.189, data_time: 0.292, memory: 7994, loss_cls: 0.1839, loss_bbox: 0.0640, loss_kps: 5.7146, loss: 5.9626
+2022-07-11 08:48:38,907 - mmdet - INFO - Epoch [40][100/241]	lr: 6.250e-05, eta: 2:08:41, time: 1.007, data_time: 0.139, memory: 7994, loss_cls: 0.1764, loss_bbox: 0.0628, loss_kps: 5.4222, loss: 5.6614
+2022-07-11 08:49:29,960 - mmdet - INFO - Epoch [40][150/241]	lr: 6.250e-05, eta: 2:07:27, time: 1.021, data_time: 0.134, memory: 7994, loss_cls: 0.1825, loss_bbox: 0.0626, loss_kps: 5.1129, loss: 5.3579
+2022-07-11 08:50:20,403 - mmdet - INFO - Epoch [40][200/241]	lr: 6.250e-05, eta: 2:06:13, time: 1.009, data_time: 0.132, memory: 7994, loss_cls: 0.1786, loss_bbox: 0.0611, loss_kps: 5.7051, loss: 5.9448
+2022-07-11 08:51:03,359 - mmdet - INFO - Saving checkpoint at 40 epochs
+2022-07-11 08:51:07,149 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 179 | 2076 | 0.944  | 0.923 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.923 |
++-------+-----+------+--------+-------+
+2022-07-11 08:51:07,270 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_poisson.py
+2022-07-11 08:51:07,270 - mmdet - INFO - Epoch(val) [40][241]	mAP: 0.9234
+2022-07-11 08:52:10,342 - mmdet - INFO - Epoch [41][50/241]	lr: 6.250e-05, eta: 2:03:42, time: 1.260, data_time: 0.324, memory: 7994, loss_cls: 0.1810, loss_bbox: 0.0622, loss_kps: 5.3972, loss: 5.6405
+2022-07-11 08:53:00,737 - mmdet - INFO - Epoch [41][100/241]	lr: 6.250e-05, eta: 2:02:29, time: 1.008, data_time: 0.132, memory: 7994, loss_cls: 0.1830, loss_bbox: 0.0625, loss_kps: 5.2845, loss: 5.5300
+2022-07-11 08:53:50,997 - mmdet - INFO - Epoch [41][150/241]	lr: 6.250e-05, eta: 2:01:16, time: 1.005, data_time: 0.129, memory: 7994, loss_cls: 0.1832, loss_bbox: 0.0626, loss_kps: 5.0443, loss: 5.2901
+2022-07-11 08:54:41,982 - mmdet - INFO - Epoch [41][200/241]	lr: 6.250e-05, eta: 2:00:04, time: 1.020, data_time: 0.132, memory: 7994, loss_cls: 0.1755, loss_bbox: 0.0630, loss_kps: 5.8725, loss: 6.1110
+2022-07-11 08:56:21,309 - mmdet - INFO - Epoch [42][50/241]	lr: 6.250e-05, eta: 1:57:34, time: 1.174, data_time: 0.278, memory: 7994, loss_cls: 0.1778, loss_bbox: 0.0626, loss_kps: 5.1620, loss: 5.4024
+2022-07-11 08:57:12,351 - mmdet - INFO - Epoch [42][100/241]	lr: 6.250e-05, eta: 1:56:23, time: 1.021, data_time: 0.136, memory: 7994, loss_cls: 0.1817, loss_bbox: 0.0632, loss_kps: 6.1193, loss: 6.3641
+2022-07-11 08:58:02,817 - mmdet - INFO - Epoch [42][150/241]	lr: 6.250e-05, eta: 1:55:11, time: 1.009, data_time: 0.134, memory: 7994, loss_cls: 0.1785, loss_bbox: 0.0623, loss_kps: 5.1902, loss: 5.4309
+2022-07-11 08:58:53,713 - mmdet - INFO - Epoch [42][200/241]	lr: 6.250e-05, eta: 1:54:00, time: 1.018, data_time: 0.137, memory: 7994, loss_cls: 0.1813, loss_bbox: 0.0630, loss_kps: 5.4948, loss: 5.7391
+2022-07-11 09:00:33,964 - mmdet - INFO - Epoch [43][50/241]	lr: 6.250e-05, eta: 1:51:34, time: 1.185, data_time: 0.278, memory: 7994, loss_cls: 0.1790, loss_bbox: 0.0626, loss_kps: 5.5248, loss: 5.7664
+2022-07-11 09:01:24,659 - mmdet - INFO - Epoch [43][100/241]	lr: 6.250e-05, eta: 1:50:24, time: 1.014, data_time: 0.132, memory: 7994, loss_cls: 0.1805, loss_bbox: 0.0625, loss_kps: 5.2911, loss: 5.5342
+2022-07-11 09:02:15,445 - mmdet - INFO - Epoch [43][150/241]	lr: 6.250e-05, eta: 1:49:13, time: 1.016, data_time: 0.136, memory: 7994, loss_cls: 0.1812, loss_bbox: 0.0614, loss_kps: 5.1287, loss: 5.3713
+2022-07-11 09:03:05,860 - mmdet - INFO - Epoch [43][200/241]	lr: 6.250e-05, eta: 1:48:03, time: 1.008, data_time: 0.131, memory: 7994, loss_cls: 0.1810, loss_bbox: 0.0614, loss_kps: 5.2768, loss: 5.5191
+2022-07-11 09:04:45,923 - mmdet - INFO - Epoch [44][50/241]	lr: 6.250e-05, eta: 1:45:40, time: 1.182, data_time: 0.277, memory: 7994, loss_cls: 0.1805, loss_bbox: 0.0618, loss_kps: 5.3427, loss: 5.5850
+2022-07-11 09:05:36,863 - mmdet - INFO - Epoch [44][100/241]	lr: 6.250e-05, eta: 1:44:31, time: 1.019, data_time: 0.137, memory: 7994, loss_cls: 0.1809, loss_bbox: 0.0619, loss_kps: 5.6198, loss: 5.8626
+2022-07-11 09:06:27,262 - mmdet - INFO - Epoch [44][150/241]	lr: 6.250e-05, eta: 1:43:22, time: 1.008, data_time: 0.131, memory: 7994, loss_cls: 0.1784, loss_bbox: 0.0631, loss_kps: 5.3472, loss: 5.5886
+2022-07-11 09:07:17,631 - mmdet - INFO - Epoch [44][200/241]	lr: 6.250e-05, eta: 1:42:13, time: 1.007, data_time: 0.134, memory: 7994, loss_cls: 0.1825, loss_bbox: 0.0624, loss_kps: 5.4073, loss: 5.6522
+2022-07-11 09:08:57,268 - mmdet - INFO - Epoch [45][50/241]	lr: 6.250e-05, eta: 1:39:53, time: 1.171, data_time: 0.272, memory: 7994, loss_cls: 0.1793, loss_bbox: 0.0624, loss_kps: 4.9040, loss: 5.1456
+2022-07-11 09:09:47,586 - mmdet - INFO - Epoch [45][100/241]	lr: 6.250e-05, eta: 1:38:45, time: 1.006, data_time: 0.132, memory: 7994, loss_cls: 0.1804, loss_bbox: 0.0618, loss_kps: 5.4435, loss: 5.6856
+2022-07-11 09:10:37,728 - mmdet - INFO - Epoch [45][150/241]	lr: 6.250e-05, eta: 1:37:37, time: 1.003, data_time: 0.123, memory: 7994, loss_cls: 0.1806, loss_bbox: 0.0615, loss_kps: 4.9290, loss: 5.1711
+2022-07-11 09:11:28,245 - mmdet - INFO - Epoch [45][200/241]	lr: 6.250e-05, eta: 1:36:29, time: 1.010, data_time: 0.126, memory: 7994, loss_cls: 0.1823, loss_bbox: 0.0627, loss_kps: 5.5336, loss: 5.7786
+2022-07-11 09:12:09,134 - mmdet - INFO - Saving checkpoint at 45 epochs
+2022-07-11 09:12:12,930 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 179 | 2203 | 0.939  | 0.918 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.918 |
++-------+-----+------+--------+-------+
+2022-07-11 09:12:13,049 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_poisson.py
+2022-07-11 09:12:13,049 - mmdet - INFO - Epoch(val) [45][241]	mAP: 0.9181
+2022-07-11 09:13:13,139 - mmdet - INFO - Epoch [46][50/241]	lr: 6.250e-05, eta: 1:34:12, time: 1.201, data_time: 0.284, memory: 7994, loss_cls: 0.1862, loss_bbox: 0.0619, loss_kps: 5.3701, loss: 5.6182
+2022-07-11 09:14:03,934 - mmdet - INFO - Epoch [46][100/241]	lr: 6.250e-05, eta: 1:33:05, time: 1.016, data_time: 0.135, memory: 7994, loss_cls: 0.1771, loss_bbox: 0.0609, loss_kps: 5.1538, loss: 5.3918
+2022-07-11 09:14:54,715 - mmdet - INFO - Epoch [46][150/241]	lr: 6.250e-05, eta: 1:31:58, time: 1.016, data_time: 0.137, memory: 7994, loss_cls: 0.1791, loss_bbox: 0.0635, loss_kps: 5.7488, loss: 5.9914
+2022-07-11 09:15:45,281 - mmdet - INFO - Epoch [46][200/241]	lr: 6.250e-05, eta: 1:30:51, time: 1.011, data_time: 0.133, memory: 7994, loss_cls: 0.1779, loss_bbox: 0.0622, loss_kps: 5.3609, loss: 5.6010
+2022-07-11 09:17:24,978 - mmdet - INFO - Epoch [47][50/241]	lr: 6.250e-05, eta: 1:28:37, time: 1.176, data_time: 0.276, memory: 7994, loss_cls: 0.1808, loss_bbox: 0.0613, loss_kps: 5.0375, loss: 5.2797
+2022-07-11 09:18:15,990 - mmdet - INFO - Epoch [47][100/241]	lr: 6.250e-05, eta: 1:27:31, time: 1.020, data_time: 0.142, memory: 7994, loss_cls: 0.1790, loss_bbox: 0.0614, loss_kps: 5.0607, loss: 5.3011
+2022-07-11 09:19:06,751 - mmdet - INFO - Epoch [47][150/241]	lr: 6.250e-05, eta: 1:26:24, time: 1.015, data_time: 0.133, memory: 7994, loss_cls: 0.1763, loss_bbox: 0.0615, loss_kps: 5.0863, loss: 5.3242
+2022-07-11 09:19:56,950 - mmdet - INFO - Epoch [47][200/241]	lr: 6.250e-05, eta: 1:25:18, time: 1.004, data_time: 0.125, memory: 7994, loss_cls: 0.1796, loss_bbox: 0.0620, loss_kps: 5.6598, loss: 5.9014
+2022-07-11 09:21:36,885 - mmdet - INFO - Epoch [48][50/241]	lr: 6.250e-05, eta: 1:23:07, time: 1.184, data_time: 0.278, memory: 7994, loss_cls: 0.1797, loss_bbox: 0.0627, loss_kps: 5.5257, loss: 5.7681
+2022-07-11 09:22:26,787 - mmdet - INFO - Epoch [48][100/241]	lr: 6.250e-05, eta: 1:22:01, time: 0.998, data_time: 0.129, memory: 7994, loss_cls: 0.1775, loss_bbox: 0.0618, loss_kps: 5.5067, loss: 5.7460
+2022-07-11 09:23:16,801 - mmdet - INFO - Epoch [48][150/241]	lr: 6.250e-05, eta: 1:20:55, time: 1.000, data_time: 0.128, memory: 7994, loss_cls: 0.1789, loss_bbox: 0.0621, loss_kps: 5.1947, loss: 5.4357
+2022-07-11 09:24:07,137 - mmdet - INFO - Epoch [48][200/241]	lr: 6.250e-05, eta: 1:19:50, time: 1.007, data_time: 0.126, memory: 7994, loss_cls: 0.1795, loss_bbox: 0.0615, loss_kps: 5.5525, loss: 5.7935
+2022-07-11 09:25:46,803 - mmdet - INFO - Epoch [49][50/241]	lr: 6.250e-06, eta: 1:17:41, time: 1.178, data_time: 0.274, memory: 7994, loss_cls: 0.1748, loss_bbox: 0.0615, loss_kps: 5.4067, loss: 5.6430
+2022-07-11 09:26:37,317 - mmdet - INFO - Epoch [49][100/241]	lr: 6.250e-06, eta: 1:16:36, time: 1.010, data_time: 0.136, memory: 7994, loss_cls: 0.1789, loss_bbox: 0.0614, loss_kps: 5.6498, loss: 5.8902
+2022-07-11 09:27:27,201 - mmdet - INFO - Epoch [49][150/241]	lr: 6.250e-06, eta: 1:15:31, time: 0.998, data_time: 0.123, memory: 7994, loss_cls: 0.1782, loss_bbox: 0.0614, loss_kps: 4.8753, loss: 5.1150
+2022-07-11 09:28:18,001 - mmdet - INFO - Epoch [49][200/241]	lr: 6.250e-06, eta: 1:14:27, time: 1.016, data_time: 0.131, memory: 7994, loss_cls: 0.1814, loss_bbox: 0.0623, loss_kps: 5.6500, loss: 5.8937
+2022-07-11 09:29:57,916 - mmdet - INFO - Epoch [50][50/241]	lr: 6.250e-06, eta: 1:12:20, time: 1.180, data_time: 0.266, memory: 7994, loss_cls: 0.1830, loss_bbox: 0.0610, loss_kps: 5.2492, loss: 5.4932
+2022-07-11 09:30:48,928 - mmdet - INFO - Epoch [50][100/241]	lr: 6.250e-06, eta: 1:11:16, time: 1.020, data_time: 0.137, memory: 7994, loss_cls: 0.1800, loss_bbox: 0.0616, loss_kps: 5.2936, loss: 5.5352
+2022-07-11 09:31:39,430 - mmdet - INFO - Epoch [50][150/241]	lr: 6.250e-06, eta: 1:10:13, time: 1.010, data_time: 0.132, memory: 7994, loss_cls: 0.1824, loss_bbox: 0.0620, loss_kps: 4.9464, loss: 5.1908
+2022-07-11 09:32:29,535 - mmdet - INFO - Epoch [50][200/241]	lr: 6.250e-06, eta: 1:09:09, time: 1.002, data_time: 0.131, memory: 7994, loss_cls: 0.1787, loss_bbox: 0.0616, loss_kps: 5.3424, loss: 5.5827
+2022-07-11 09:33:10,353 - mmdet - INFO - Saving checkpoint at 50 epochs
+2022-07-11 09:33:14,095 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 179 | 2141 | 0.933  | 0.922 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.922 |
++-------+-----+------+--------+-------+
+2022-07-11 09:33:14,200 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_poisson.py
+2022-07-11 09:33:14,201 - mmdet - INFO - Epoch(val) [50][241]	mAP: 0.9217
+2022-07-11 09:34:14,098 - mmdet - INFO - Epoch [51][50/241]	lr: 6.250e-06, eta: 1:07:04, time: 1.197, data_time: 0.289, memory: 7994, loss_cls: 0.1790, loss_bbox: 0.0608, loss_kps: 5.4793, loss: 5.7191
+2022-07-11 09:35:04,752 - mmdet - INFO - Epoch [51][100/241]	lr: 6.250e-06, eta: 1:06:01, time: 1.013, data_time: 0.135, memory: 7994, loss_cls: 0.1802, loss_bbox: 0.0606, loss_kps: 5.2336, loss: 5.4744
+2022-07-11 09:35:55,158 - mmdet - INFO - Epoch [51][150/241]	lr: 6.250e-06, eta: 1:04:58, time: 1.008, data_time: 0.131, memory: 7994, loss_cls: 0.1838, loss_bbox: 0.0610, loss_kps: 5.4449, loss: 5.6897
+2022-07-11 09:36:45,674 - mmdet - INFO - Epoch [51][200/241]	lr: 6.250e-06, eta: 1:03:55, time: 1.010, data_time: 0.130, memory: 7994, loss_cls: 0.1802, loss_bbox: 0.0610, loss_kps: 4.9487, loss: 5.1899
+2022-07-11 09:38:24,977 - mmdet - INFO - Epoch [52][50/241]	lr: 6.250e-06, eta: 1:01:52, time: 1.169, data_time: 0.270, memory: 7994, loss_cls: 0.1784, loss_bbox: 0.0623, loss_kps: 5.3683, loss: 5.6090
+2022-07-11 09:39:15,022 - mmdet - INFO - Epoch [52][100/241]	lr: 6.250e-06, eta: 1:00:49, time: 1.001, data_time: 0.135, memory: 7994, loss_cls: 0.1778, loss_bbox: 0.0607, loss_kps: 5.4581, loss: 5.6967
+2022-07-11 09:40:05,654 - mmdet - INFO - Epoch [52][150/241]	lr: 6.250e-06, eta: 0:59:47, time: 1.013, data_time: 0.126, memory: 7994, loss_cls: 0.1851, loss_bbox: 0.0621, loss_kps: 5.3610, loss: 5.6082
+2022-07-11 09:40:55,752 - mmdet - INFO - Epoch [52][200/241]	lr: 6.250e-06, eta: 0:58:44, time: 1.002, data_time: 0.127, memory: 7994, loss_cls: 0.1823, loss_bbox: 0.0616, loss_kps: 5.6394, loss: 5.8834
+2022-07-11 09:42:34,936 - mmdet - INFO - Epoch [53][50/241]	lr: 6.250e-06, eta: 0:56:44, time: 1.170, data_time: 0.271, memory: 7994, loss_cls: 0.1792, loss_bbox: 0.0604, loss_kps: 5.0527, loss: 5.2923
+2022-07-11 09:43:25,072 - mmdet - INFO - Epoch [53][100/241]	lr: 6.250e-06, eta: 0:55:41, time: 1.003, data_time: 0.129, memory: 7994, loss_cls: 0.1768, loss_bbox: 0.0610, loss_kps: 5.5366, loss: 5.7744
+2022-07-11 09:44:15,635 - mmdet - INFO - Epoch [53][150/241]	lr: 6.250e-06, eta: 0:54:40, time: 1.011, data_time: 0.135, memory: 7994, loss_cls: 0.1812, loss_bbox: 0.0618, loss_kps: 5.4593, loss: 5.7024
+2022-07-11 09:45:05,752 - mmdet - INFO - Epoch [53][200/241]	lr: 6.250e-06, eta: 0:53:38, time: 1.002, data_time: 0.130, memory: 7994, loss_cls: 0.1788, loss_bbox: 0.0610, loss_kps: 5.2385, loss: 5.4783
+2022-07-11 09:46:45,916 - mmdet - INFO - Epoch [54][50/241]	lr: 6.250e-06, eta: 0:51:39, time: 1.181, data_time: 0.281, memory: 7994, loss_cls: 0.1803, loss_bbox: 0.0610, loss_kps: 5.4728, loss: 5.7141
+2022-07-11 09:47:36,511 - mmdet - INFO - Epoch [54][100/241]	lr: 6.250e-06, eta: 0:50:38, time: 1.012, data_time: 0.131, memory: 7994, loss_cls: 0.1782, loss_bbox: 0.0620, loss_kps: 5.3370, loss: 5.5771
+2022-07-11 09:48:27,306 - mmdet - INFO - Epoch [54][150/241]	lr: 6.250e-06, eta: 0:49:36, time: 1.016, data_time: 0.132, memory: 7994, loss_cls: 0.1771, loss_bbox: 0.0617, loss_kps: 5.0545, loss: 5.2932
+2022-07-11 09:49:17,423 - mmdet - INFO - Epoch [54][200/241]	lr: 6.250e-06, eta: 0:48:35, time: 1.002, data_time: 0.125, memory: 7994, loss_cls: 0.1815, loss_bbox: 0.0616, loss_kps: 5.3620, loss: 5.6051
+2022-07-11 09:50:57,345 - mmdet - INFO - Epoch [55][50/241]	lr: 6.250e-06, eta: 0:46:38, time: 1.182, data_time: 0.279, memory: 7994, loss_cls: 0.1779, loss_bbox: 0.0614, loss_kps: 5.5128, loss: 5.7521
+2022-07-11 09:51:47,677 - mmdet - INFO - Epoch [55][100/241]	lr: 6.250e-06, eta: 0:45:37, time: 1.007, data_time: 0.127, memory: 7994, loss_cls: 0.1794, loss_bbox: 0.0613, loss_kps: 5.0665, loss: 5.3072
+2022-07-11 09:52:38,056 - mmdet - INFO - Epoch [55][150/241]	lr: 6.250e-06, eta: 0:44:36, time: 1.008, data_time: 0.135, memory: 7994, loss_cls: 0.1762, loss_bbox: 0.0611, loss_kps: 5.3142, loss: 5.5515
+2022-07-11 09:53:28,313 - mmdet - INFO - Epoch [55][200/241]	lr: 6.250e-06, eta: 0:43:36, time: 1.005, data_time: 0.129, memory: 7994, loss_cls: 0.1800, loss_bbox: 0.0610, loss_kps: 5.1289, loss: 5.3698
+2022-07-11 09:54:09,002 - mmdet - INFO - Saving checkpoint at 55 epochs
+2022-07-11 09:54:12,874 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 179 | 2100 | 0.927  | 0.912 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.912 |
++-------+-----+------+--------+-------+
+2022-07-11 09:54:12,970 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_poisson.py
+2022-07-11 09:54:12,970 - mmdet - INFO - Epoch(val) [55][241]	mAP: 0.9117
+2022-07-11 09:55:12,881 - mmdet - INFO - Epoch [56][50/241]	lr: 6.250e-06, eta: 0:41:40, time: 1.197, data_time: 0.284, memory: 7994, loss_cls: 0.1784, loss_bbox: 0.0603, loss_kps: 5.4082, loss: 5.6470
+2022-07-11 09:56:02,789 - mmdet - INFO - Epoch [56][100/241]	lr: 6.250e-06, eta: 0:40:40, time: 0.998, data_time: 0.123, memory: 7994, loss_cls: 0.1806, loss_bbox: 0.0623, loss_kps: 4.8533, loss: 5.0963
+2022-07-11 09:56:52,945 - mmdet - INFO - Epoch [56][150/241]	lr: 6.250e-06, eta: 0:39:39, time: 1.003, data_time: 0.122, memory: 7994, loss_cls: 0.1791, loss_bbox: 0.0617, loss_kps: 5.6137, loss: 5.8545
+2022-07-11 09:57:43,307 - mmdet - INFO - Epoch [56][200/241]	lr: 6.250e-06, eta: 0:38:39, time: 1.007, data_time: 0.132, memory: 7994, loss_cls: 0.1800, loss_bbox: 0.0615, loss_kps: 5.4772, loss: 5.7187
+2022-07-11 09:59:23,208 - mmdet - INFO - Epoch [57][50/241]	lr: 6.250e-06, eta: 0:36:45, time: 1.177, data_time: 0.274, memory: 7994, loss_cls: 0.1807, loss_bbox: 0.0614, loss_kps: 5.3194, loss: 5.5615
+2022-07-11 10:00:13,600 - mmdet - INFO - Epoch [57][100/241]	lr: 6.250e-06, eta: 0:35:46, time: 1.008, data_time: 0.134, memory: 7994, loss_cls: 0.1773, loss_bbox: 0.0606, loss_kps: 5.2473, loss: 5.4852
+2022-07-11 10:01:04,426 - mmdet - INFO - Epoch [57][150/241]	lr: 6.250e-06, eta: 0:34:46, time: 1.016, data_time: 0.138, memory: 7994, loss_cls: 0.1771, loss_bbox: 0.0621, loss_kps: 5.2411, loss: 5.4803
+2022-07-11 10:01:55,060 - mmdet - INFO - Epoch [57][200/241]	lr: 6.250e-06, eta: 0:33:46, time: 1.013, data_time: 0.131, memory: 7994, loss_cls: 0.1769, loss_bbox: 0.0606, loss_kps: 5.1071, loss: 5.3446
+2022-07-11 10:03:35,911 - mmdet - INFO - Epoch [58][50/241]	lr: 6.250e-06, eta: 0:31:54, time: 1.195, data_time: 0.281, memory: 7994, loss_cls: 0.1791, loss_bbox: 0.0609, loss_kps: 4.8504, loss: 5.0903
+2022-07-11 10:04:26,820 - mmdet - INFO - Epoch [58][100/241]	lr: 6.250e-06, eta: 0:30:54, time: 1.018, data_time: 0.144, memory: 7994, loss_cls: 0.1825, loss_bbox: 0.0615, loss_kps: 4.9918, loss: 5.2357
+2022-07-11 10:05:17,351 - mmdet - INFO - Epoch [58][150/241]	lr: 6.250e-06, eta: 0:29:55, time: 1.011, data_time: 0.127, memory: 7994, loss_cls: 0.1746, loss_bbox: 0.0607, loss_kps: 4.8971, loss: 5.1324
+2022-07-11 10:06:07,767 - mmdet - INFO - Epoch [58][200/241]	lr: 6.250e-06, eta: 0:28:56, time: 1.008, data_time: 0.131, memory: 7994, loss_cls: 0.1808, loss_bbox: 0.0618, loss_kps: 5.0614, loss: 5.3040
+2022-07-11 10:07:47,890 - mmdet - INFO - Epoch [59][50/241]	lr: 6.250e-06, eta: 0:27:05, time: 1.182, data_time: 0.282, memory: 7994, loss_cls: 0.1781, loss_bbox: 0.0615, loss_kps: 4.8837, loss: 5.1233
+2022-07-11 10:08:38,322 - mmdet - INFO - Epoch [59][100/241]	lr: 6.250e-06, eta: 0:26:06, time: 1.009, data_time: 0.134, memory: 7994, loss_cls: 0.1822, loss_bbox: 0.0619, loss_kps: 5.3096, loss: 5.5536
+2022-07-11 10:09:28,606 - mmdet - INFO - Epoch [59][150/241]	lr: 6.250e-06, eta: 0:25:07, time: 1.006, data_time: 0.132, memory: 7994, loss_cls: 0.1820, loss_bbox: 0.0628, loss_kps: 5.5953, loss: 5.8401
+2022-07-11 10:10:18,884 - mmdet - INFO - Epoch [59][200/241]	lr: 6.250e-06, eta: 0:24:08, time: 1.006, data_time: 0.131, memory: 7994, loss_cls: 0.1809, loss_bbox: 0.0621, loss_kps: 5.1538, loss: 5.3968
+2022-07-11 10:11:58,112 - mmdet - INFO - Epoch [60][50/241]	lr: 6.250e-06, eta: 0:22:19, time: 1.171, data_time: 0.263, memory: 7994, loss_cls: 0.1818, loss_bbox: 0.0611, loss_kps: 5.5422, loss: 5.7850
+2022-07-11 10:12:48,733 - mmdet - INFO - Epoch [60][100/241]	lr: 6.250e-06, eta: 0:21:20, time: 1.012, data_time: 0.139, memory: 7994, loss_cls: 0.1774, loss_bbox: 0.0614, loss_kps: 5.0834, loss: 5.3222
+2022-07-11 10:13:40,365 - mmdet - INFO - Epoch [60][150/241]	lr: 6.250e-06, eta: 0:20:22, time: 1.033, data_time: 0.127, memory: 7994, loss_cls: 0.1800, loss_bbox: 0.0618, loss_kps: 4.9679, loss: 5.2098
+2022-07-11 10:14:30,657 - mmdet - INFO - Epoch [60][200/241]	lr: 6.250e-06, eta: 0:19:23, time: 1.006, data_time: 0.131, memory: 7994, loss_cls: 0.1794, loss_bbox: 0.0610, loss_kps: 5.6554, loss: 5.8958
+2022-07-11 10:15:11,340 - mmdet - INFO - Saving checkpoint at 60 epochs
+2022-07-11 10:15:14,995 - mmdet - INFO - 
++-------+-----+------+--------+-------+
+| class | gts | dets | recall | ap    |
++-------+-----+------+--------+-------+
+| FG    | 179 | 2055 | 0.939  | 0.917 |
++-------+-----+------+--------+-------+
+| mAP   |     |      |        | 0.917 |
++-------+-----+------+--------+-------+
+2022-07-11 10:15:15,113 - mmdet - INFO - Exp name: scrfd_cccd_500m_bnkps_poisson.py
+2022-07-11 10:15:15,113 - mmdet - INFO - Epoch(val) [60][241]	mAP: 0.9170
+2022-07-11 10:16:14,604 - mmdet - INFO - Epoch [61][50/241]	lr: 6.250e-06, eta: 0:17:35, time: 1.189, data_time: 0.277, memory: 7994, loss_cls: 0.1793, loss_bbox: 0.0617, loss_kps: 4.9875, loss: 5.2285
+2022-07-11 10:17:05,228 - mmdet - INFO - Epoch [61][100/241]	lr: 6.250e-06, eta: 0:16:37, time: 1.012, data_time: 0.136, memory: 7994, loss_cls: 0.1824, loss_bbox: 0.0615, loss_kps: 5.3494, loss: 5.5933
+2022-07-11 10:17:55,314 - mmdet - INFO - Epoch [61][150/241]	lr: 6.250e-06, eta: 0:15:39, time: 1.002, data_time: 0.126, memory: 7994, loss_cls: 0.1763, loss_bbox: 0.0620, loss_kps: 5.2285, loss: 5.4668
+2022-07-11 10:18:46,446 - mmdet - INFO - Epoch [61][200/241]	lr: 6.250e-06, eta: 0:14:41, time: 1.023, data_time: 0.138, memory: 7994, loss_cls: 0.1829, loss_bbox: 0.0613, loss_kps: 5.7094, loss: 5.9536
+2022-07-11 10:20:26,295 - mmdet - INFO - Epoch [62][50/241]	lr: 6.250e-06, eta: 0:12:54, time: 1.182, data_time: 0.278, memory: 7994, loss_cls: 0.1816, loss_bbox: 0.0611, loss_kps: 5.5440, loss: 5.7867
+2022-07-11 10:21:16,041 - mmdet - INFO - Epoch [62][100/241]	lr: 6.250e-06, eta: 0:11:56, time: 0.995, data_time: 0.131, memory: 7994, loss_cls: 0.1755, loss_bbox: 0.0608, loss_kps: 5.6402, loss: 5.8765
+2022-07-11 10:22:05,801 - mmdet - INFO - Epoch [62][150/241]	lr: 6.250e-06, eta: 0:10:58, time: 0.995, data_time: 0.133, memory: 7994, loss_cls: 0.1780, loss_bbox: 0.0616, loss_kps: 5.4693, loss: 5.7090
+2022-07-11 10:22:55,584 - mmdet - INFO - Epoch [62][200/241]	lr: 6.250e-06, eta: 0:10:00, time: 0.996, data_time: 0.125, memory: 7994, loss_cls: 0.1768, loss_bbox: 0.0608, loss_kps: 5.1036, loss: 5.3412
+2022-07-11 10:24:35,478 - mmdet - INFO - Epoch [63][50/241]	lr: 6.250e-06, eta: 0:08:14, time: 1.181, data_time: 0.275, memory: 7994, loss_cls: 0.1804, loss_bbox: 0.0619, loss_kps: 5.1149, loss: 5.3572
+2022-07-11 10:25:25,594 - mmdet - INFO - Epoch [63][100/241]	lr: 6.250e-06, eta: 0:07:17, time: 1.002, data_time: 0.131, memory: 7994, loss_cls: 0.1803, loss_bbox: 0.0610, loss_kps: 5.5357, loss: 5.7771
+2022-07-11 10:26:16,080 - mmdet - INFO - Epoch [63][150/241]	lr: 6.250e-06, eta: 0:06:20, time: 1.010, data_time: 0.133, memory: 7994, loss_cls: 0.1780, loss_bbox: 0.0614, loss_kps: 5.5060, loss: 5.7454
+2022-07-11 10:27:06,464 - mmdet - INFO - Epoch [63][200/241]	lr: 6.250e-06, eta: 0:05:22, time: 1.008, data_time: 0.133, memory: 7994, loss_cls: 0.1784, loss_bbox: 0.0622, loss_kps: 5.2098, loss: 5.4504
+2022-07-11 10:28:46,458 - mmdet - INFO - Epoch [64][50/241]	lr: 6.250e-06, eta: 0:03:37, time: 1.183, data_time: 0.281, memory: 7994, loss_cls: 0.1779, loss_bbox: 0.0613, loss_kps: 4.8417, loss: 5.0808
+2022-07-11 10:29:36,658 - mmdet - INFO - Epoch [64][100/241]	lr: 6.250e-06, eta: 0:02:40, time: 1.004, data_time: 0.134, memory: 7994, loss_cls: 0.1786, loss_bbox: 0.0607, loss_kps: 5.3475, loss: 5.5868
+2022-07-11 10:30:26,901 - mmdet - INFO - Epoch [64][150/241]	lr: 6.250e-06, eta: 0:01:43, time: 1.005, data_time: 0.128, memory: 7994, loss_cls: 0.1769, loss_bbox: 0.0601, loss_kps: 5.2393, loss: 5.4762
+2022-07-11 10:31:17,517 - mmdet - INFO - Epoch [64][200/241]	lr: 6.250e-06, eta: 0:00:46, time: 1.012, data_time: 0.133, memory: 7994, loss_cls: 0.1789, loss_bbox: 0.0623, loss_kps: 5.4276, loss: 5.6688
+2022-07-11 10:31:58,245 - mmdet - INFO - Saving checkpoint at 64 epochs

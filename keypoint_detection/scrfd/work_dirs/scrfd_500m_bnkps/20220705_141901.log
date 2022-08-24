@@ -1,0 +1,355 @@
+2022-07-05 14:19:01,939 - mmdet - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.9.11 (main, Mar 29 2022, 19:08:29) [GCC 7.5.0]
+CUDA available: True
+GPU 0,1: Tesla T4
+CUDA_HOME: /root/miniconda3/envs/manhdq
+NVCC: Cuda compilation tools, release 11.3, V11.3.58
+GCC: gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0
+PyTorch: 1.11.0+cu113
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) Math Kernel Library Version 2020.0.0 Product Build 20191122 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.5.2 (Git Hash a9302535553c73243c632ad3c4c80beec3d19a1e)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.3
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86
+  - CuDNN 8.2
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.3, CUDNN_VERSION=8.2.0, CXX_COMPILER=/opt/rh/devtoolset-7/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DEDGE_PROFILER_USE_KINETO -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.11.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=OFF, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+TorchVision: 0.12.0+cu113
+OpenCV: 4.4.0
+MMCV: 1.5.3
+MMCV Compiler: n/a
+MMCV CUDA Compiler: n/a
+MMDetection: 2.7.0+
+------------------------------------------------------------
+
+2022-07-05 14:19:02,849 - mmdet - INFO - Distributed training: False
+2022-07-05 14:19:03,618 - mmdet - INFO - Config:
+optimizer = dict(type='Adam', lr=0.000625, weight_decay=0.0005)
+optimizer_config = dict(grad_clip=None)
+lr_mult = 8
+lr_config = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=10,
+    warmup_ratio=0.001,
+    step=[440, 544])
+total_epochs = 64
+checkpoint_config = dict(interval=5)
+log_config = dict(interval=100, hooks=[dict(type='TextLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = None
+resume_from = None
+workflow = [('train', 1)]
+dataset_type = 'RetinaFaceDataset'
+data_root = '/home/manhdq/ID_Card_Information_Extraction/datasets'
+train_root = '/home/manhdq/ID_Card_Information_Extraction/datasets/poisson_color'
+val_root = '/home/manhdq/ID_Card_Information_Extraction/datasets/cmt_valid'
+img_norm_cfg = dict(
+    mean=[127.5, 127.5, 127.5], std=[128.0, 128.0, 128.0], to_rgb=True)
+albu_train_transforms = [
+    dict(
+        type='OneOf',
+        transforms=[
+            dict(
+                type='Affine',
+                scale=None,
+                rotate=(-30, 30),
+                shear=None,
+                interpolation=0,
+                fit_output=True)
+        ],
+        p=0.1),
+    dict(type='ToGray', p=0.2)
+]
+train_pipeline = [
+    dict(type='LoadImageFromFile', to_float32=True),
+    dict(type='LoadAnnotations', with_bbox=True, with_keypoints=True),
+    dict(
+        type='RandomSquareCrop',
+        crop_choice=[0.3, 0.45, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0]),
+    dict(type='Resize', img_scale=(640, 640), keep_ratio=False),
+    dict(
+        type='RandomFlip',
+        flip_ratio=0.5,
+        direction=['horizontal', 'vertical', 'diagonal']),
+    dict(
+        type='PhotoMetricDistortion',
+        brightness_delta=32,
+        contrast_range=(0.5, 1.5),
+        saturation_range=(0.5, 1.5),
+        hue_delta=18),
+    dict(
+        type='Normalize',
+        mean=[127.5, 127.5, 127.5],
+        std=[128.0, 128.0, 128.0],
+        to_rgb=True),
+    dict(type='DefaultFormatBundle'),
+    dict(
+        type='Collect',
+        keys=[
+            'img', 'gt_bboxes', 'gt_labels', 'gt_bboxes_ignore',
+            'gt_keypointss'
+        ])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=(640, 640),
+        flip=False,
+        transforms=[
+            dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip', flip_ratio=0.0),
+            dict(
+                type='Normalize',
+                mean=[127.5, 127.5, 127.5],
+                std=[128.0, 128.0, 128.0],
+                to_rgb=True),
+            dict(type='Pad', size=(640, 640), pad_val=0),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ])
+]
+data = dict(
+    samples_per_gpu=16,
+    workers_per_gpu=4,
+    train=dict(
+        type='RetinaFaceDataset',
+        ann_file=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/poisson_color/annotations.txt',
+        img_prefix=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/poisson_color/images',
+        pipeline=[
+            dict(type='LoadImageFromFile', to_float32=True),
+            dict(type='LoadAnnotations', with_bbox=True, with_keypoints=True),
+            dict(
+                type='RandomSquareCrop',
+                crop_choice=[
+                    0.3, 0.45, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0
+                ]),
+            dict(type='Resize', img_scale=(640, 640), keep_ratio=False),
+            dict(
+                type='RandomFlip',
+                flip_ratio=0.5,
+                direction=['horizontal', 'vertical', 'diagonal']),
+            dict(
+                type='PhotoMetricDistortion',
+                brightness_delta=32,
+                contrast_range=(0.5, 1.5),
+                saturation_range=(0.5, 1.5),
+                hue_delta=18),
+            dict(
+                type='Normalize',
+                mean=[127.5, 127.5, 127.5],
+                std=[128.0, 128.0, 128.0],
+                to_rgb=True),
+            dict(type='DefaultFormatBundle'),
+            dict(
+                type='Collect',
+                keys=[
+                    'img', 'gt_bboxes', 'gt_labels', 'gt_bboxes_ignore',
+                    'gt_keypointss'
+                ])
+        ]),
+    val=dict(
+        type='RetinaFaceDataset',
+        ann_file=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cmt_valid/annotations.txt',
+        img_prefix=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cmt_valid/images',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(640, 640),
+                flip=False,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip', flip_ratio=0.0),
+                    dict(
+                        type='Normalize',
+                        mean=[127.5, 127.5, 127.5],
+                        std=[128.0, 128.0, 128.0],
+                        to_rgb=True),
+                    dict(type='Pad', size=(640, 640), pad_val=0),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]),
+    test=dict(
+        type='RetinaFaceDataset',
+        ann_file=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cmt_valid/annotations.txt',
+        img_prefix=
+        '/home/manhdq/ID_Card_Information_Extraction/datasets/cmt_valid/images',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(640, 640),
+                flip=False,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip', flip_ratio=0.0),
+                    dict(
+                        type='Normalize',
+                        mean=[127.5, 127.5, 127.5],
+                        std=[128.0, 128.0, 128.0],
+                        to_rgb=True),
+                    dict(type='Pad', size=(640, 640), pad_val=0),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]))
+model = dict(
+    type='SCRFD',
+    backbone=dict(
+        type='MobileNetV1',
+        block_cfg=dict(
+            stage_blocks=(2, 3, 2, 6), stage_planes=[16, 16, 40, 72, 152,
+                                                     288])),
+    neck=dict(
+        type='PAFPN',
+        in_channels=[40, 72, 152, 288],
+        out_channels=16,
+        start_level=1,
+        add_extra_convs='on_output',
+        num_outs=3),
+    bbox_head=dict(
+        type='SCRFDHead',
+        num_classes=1,
+        in_channels=16,
+        stacked_convs=2,
+        feat_channels=64,
+        norm_cfg=dict(type='BN', requires_grad=True),
+        cls_reg_share=True,
+        strides_share=False,
+        dw_conv=True,
+        scale_mode=0,
+        anchor_generator=dict(
+            type='AnchorGenerator',
+            ratios=[1.0],
+            scales=[1, 2],
+            base_sizes=[16, 64, 256],
+            strides=[8, 16, 32]),
+        loss_cls=dict(
+            type='QualityFocalLoss',
+            use_sigmoid=True,
+            beta=2.0,
+            loss_weight=1.0),
+        loss_dfl=False,
+        reg_max=8,
+        loss_bbox=dict(type='DIoULoss', loss_weight=1.0),
+        use_kps=True,
+        loss_kps=dict(
+            type='SmoothL1Loss', beta=0.1111111111111111, loss_weight=1.0),
+        train_cfg=dict(
+            assigner=dict(type='ATSSAssigner', topk=9),
+            allowed_border=-1,
+            pos_weight=-1,
+            debug=False),
+        test_cfg=dict(
+            nms_pre=-1,
+            min_bbox_size=0,
+            score_thr=0.02,
+            nms=dict(type='nms', iou_threshold=0.45),
+            max_per_img=-1)))
+train_cfg = dict(
+    assigner=dict(type='ATSSAssigner', topk=9),
+    allowed_border=-1,
+    pos_weight=-1,
+    debug=False)
+test_cfg = dict(
+    nms_pre=-1,
+    min_bbox_size=0,
+    score_thr=0.02,
+    nms=dict(type='nms', iou_threshold=0.45),
+    max_per_img=-1)
+epoch_multi = 1
+evaluation = dict(interval=5, metric='mAP')
+work_dir = './work_dirs/scrfd_500m_bnkps'
+gpu_ids = range(0, 1)
+
+2022-07-05 14:19:03,618 - mmdet - INFO - Set random seed to 42, deterministic: False
+2022-07-05 14:19:07,899 - mmdet - INFO - Start running, host: root@ATMA-Ubuntu20-ARP-v3, work_dir: /home/manhdq/ID_Card_Information_Extraction/keypoint_detection/scrfd/work_dirs/scrfd_500m_bnkps
+2022-07-05 14:19:07,899 - mmdet - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(NORMAL      ) CheckpointHook                     
+(NORMAL      ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(NORMAL      ) EvalHook                           
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_train_iter:
+(ABOVE_NORMAL) OptimizerHook                      
+(NORMAL      ) CheckpointHook                     
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) CheckpointHook                     
+(NORMAL      ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_epoch:
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_epoch:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_run:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+2022-07-05 14:19:07,899 - mmdet - INFO - workflow: [('train', 1)], max: 64 epochs
+2022-07-05 14:19:07,899 - mmdet - INFO - Checkpoints will be saved to /home/manhdq/ID_Card_Information_Extraction/keypoint_detection/scrfd/work_dirs/scrfd_500m_bnkps by HardDiskBackend.
+2022-07-05 14:19:45,021 - mmdet - INFO - Epoch [1][100/1312]	lr: 6.250e-04, eta: 8:38:51, time: 0.371, data_time: 0.068, memory: 2017, loss_cls: 0.3552, loss_bbox: 0.6015, loss_kps: 39.7871, loss: 40.7438
+2022-07-05 14:20:20,086 - mmdet - INFO - Epoch [1][200/1312]	lr: 6.250e-04, eta: 8:23:53, time: 0.351, data_time: 0.034, memory: 2017, loss_cls: 0.5428, loss_bbox: 0.3837, loss_kps: 40.3111, loss: 41.2375
+2022-07-05 14:20:47,705 - mmdet - INFO - Epoch [1][300/1312]	lr: 6.250e-04, eta: 7:43:53, time: 0.276, data_time: 0.036, memory: 2017, loss_cls: 0.5306, loss_bbox: 0.4001, loss_kps: 38.7155, loss: 39.6462
+2022-07-05 14:21:14,887 - mmdet - INFO - Epoch [1][400/1312]	lr: 6.250e-04, eta: 7:22:09, time: 0.272, data_time: 0.035, memory: 2017, loss_cls: 0.5764, loss_bbox: 0.3744, loss_kps: 39.0831, loss: 40.0340
+2022-07-05 14:21:42,190 - mmdet - INFO - Epoch [1][500/1312]	lr: 6.250e-04, eta: 7:09:15, time: 0.273, data_time: 0.035, memory: 2017, loss_cls: 0.6028, loss_bbox: 0.3691, loss_kps: 37.5258, loss: 38.4978
+2022-07-05 14:22:09,504 - mmdet - INFO - Epoch [1][600/1312]	lr: 6.250e-04, eta: 7:00:32, time: 0.273, data_time: 0.035, memory: 2017, loss_cls: 0.5901, loss_bbox: 0.3767, loss_kps: 37.6768, loss: 38.6436
+2022-07-05 14:22:37,079 - mmdet - INFO - Epoch [1][700/1312]	lr: 6.250e-04, eta: 6:54:41, time: 0.276, data_time: 0.036, memory: 2017, loss_cls: 0.5761, loss_bbox: 0.3763, loss_kps: 37.4050, loss: 38.3574
+2022-07-05 14:23:04,513 - mmdet - INFO - Epoch [1][800/1312]	lr: 6.250e-04, eta: 6:49:57, time: 0.274, data_time: 0.036, memory: 2017, loss_cls: 0.5726, loss_bbox: 0.3845, loss_kps: 36.3161, loss: 37.2732
+2022-07-05 14:23:32,028 - mmdet - INFO - Epoch [1][900/1312]	lr: 6.250e-04, eta: 6:46:17, time: 0.275, data_time: 0.036, memory: 2017, loss_cls: 0.5805, loss_bbox: 0.3743, loss_kps: 37.0579, loss: 38.0127
+2022-07-05 14:23:59,369 - mmdet - INFO - Exp name: scrfd_500m_bnkps.py
+2022-07-05 14:23:59,369 - mmdet - INFO - Epoch [1][1000/1312]	lr: 6.250e-04, eta: 6:43:01, time: 0.273, data_time: 0.035, memory: 2017, loss_cls: 0.6192, loss_bbox: 0.3717, loss_kps: 37.2109, loss: 38.2017
+2022-07-05 14:24:26,404 - mmdet - INFO - Epoch [1][1100/1312]	lr: 6.250e-04, eta: 6:39:53, time: 0.270, data_time: 0.034, memory: 2017, loss_cls: 0.6106, loss_bbox: 0.3691, loss_kps: 35.6195, loss: 36.5992
+2022-07-05 14:24:53,550 - mmdet - INFO - Epoch [1][1200/1312]	lr: 6.250e-04, eta: 6:37:19, time: 0.271, data_time: 0.035, memory: 2017, loss_cls: 0.6257, loss_bbox: 0.3631, loss_kps: 34.9785, loss: 35.9673
+2022-07-05 14:25:21,231 - mmdet - INFO - Epoch [1][1300/1312]	lr: 6.250e-04, eta: 6:35:39, time: 0.277, data_time: 0.036, memory: 2017, loss_cls: 0.5920, loss_bbox: 0.3659, loss_kps: 33.7022, loss: 34.6601
+2022-07-05 14:25:55,402 - mmdet - INFO - Epoch [2][100/1312]	lr: 6.250e-04, eta: 6:33:52, time: 0.309, data_time: 0.068, memory: 2017, loss_cls: 0.6116, loss_bbox: 0.3608, loss_kps: 33.3484, loss: 34.3207
+2022-07-05 14:26:22,759 - mmdet - INFO - Epoch [2][200/1312]	lr: 6.250e-04, eta: 6:32:14, time: 0.274, data_time: 0.036, memory: 2017, loss_cls: 0.6172, loss_bbox: 0.3569, loss_kps: 31.9614, loss: 32.9355
+2022-07-05 14:26:49,987 - mmdet - INFO - Epoch [2][300/1312]	lr: 6.250e-04, eta: 6:30:38, time: 0.272, data_time: 0.035, memory: 2017, loss_cls: 0.6162, loss_bbox: 0.3576, loss_kps: 31.7101, loss: 32.6839
+2022-07-05 14:27:17,217 - mmdet - INFO - Epoch [2][400/1312]	lr: 6.250e-04, eta: 6:29:11, time: 0.272, data_time: 0.036, memory: 2017, loss_cls: 0.6220, loss_bbox: 0.3506, loss_kps: 30.7320, loss: 31.7046
+2022-07-05 14:27:44,597 - mmdet - INFO - Epoch [2][500/1312]	lr: 6.250e-04, eta: 6:27:56, time: 0.274, data_time: 0.036, memory: 2017, loss_cls: 0.6232, loss_bbox: 0.3418, loss_kps: 31.1286, loss: 32.0936
+2022-07-05 14:28:12,092 - mmdet - INFO - Epoch [2][600/1312]	lr: 6.250e-04, eta: 6:26:52, time: 0.275, data_time: 0.036, memory: 2017, loss_cls: 0.6232, loss_bbox: 0.3442, loss_kps: 30.2998, loss: 31.2672
+2022-07-05 14:28:39,734 - mmdet - INFO - Epoch [2][700/1312]	lr: 6.250e-04, eta: 6:25:57, time: 0.276, data_time: 0.036, memory: 2017, loss_cls: 0.6211, loss_bbox: 0.3435, loss_kps: 28.9660, loss: 29.9306
+2022-07-05 14:29:07,539 - mmdet - INFO - Epoch [2][800/1312]	lr: 6.250e-04, eta: 6:25:12, time: 0.278, data_time: 0.038, memory: 2017, loss_cls: 0.6365, loss_bbox: 0.3351, loss_kps: 27.8806, loss: 28.8522
+2022-07-05 14:29:34,719 - mmdet - INFO - Epoch [2][900/1312]	lr: 6.250e-04, eta: 6:24:04, time: 0.272, data_time: 0.036, memory: 2017, loss_cls: 0.6277, loss_bbox: 0.3371, loss_kps: 29.7217, loss: 30.6865
+2022-07-05 14:30:02,203 - mmdet - INFO - Epoch [2][1000/1312]	lr: 6.250e-04, eta: 6:23:11, time: 0.275, data_time: 0.037, memory: 2017, loss_cls: 0.6392, loss_bbox: 0.3312, loss_kps: 29.8857, loss: 30.8561
+2022-07-05 14:30:29,952 - mmdet - INFO - Epoch [2][1100/1312]	lr: 6.250e-04, eta: 6:22:29, time: 0.277, data_time: 0.037, memory: 2017, loss_cls: 0.6366, loss_bbox: 0.3315, loss_kps: 28.9040, loss: 29.8722
