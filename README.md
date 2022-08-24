@@ -30,7 +30,9 @@ The pineline of this sources consists of 3 steps:
 
 
 ## <div align="center">Quick Start Tutorial</div>
+
 <details open>
+<summary>Prepare checkpoints</summary>
 You should download each checkpoint for each module and place it in its ckpts path according to the pretrained models I prepare in here.
 
 ---
